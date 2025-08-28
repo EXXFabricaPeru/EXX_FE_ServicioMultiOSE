@@ -1,0 +1,499 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="EXX_COMPROBANTES_ELECTRONICOS" xml:space="preserve">
+    <value>PROCEDURE "EXX_COMPROBANTES_ELECTRONICOS"
+(
+ IN Fecha1 date,
+ IN fecha2 date,
+ IN tipodoc nvarchar(500),
+ IN estado nvarchar(5)
+) 
+LANGUAGE SQLSCRIPT AS
+BEGIN 
+
+ SELECT  * ,CURRENT_DATE FROM (
+ 
+  SELECT 'OINV' "Tabla", comp."ObjType", comp."DocEntry","DocNum",cli."LicTradNum"  as "Ruc",comp."CardName",comp."DocCur",comp."DocDate",comp."Indicator" as Indicator,
+  case comp."Indicator" when '01' then 'FACTURA'
+  when '03' then 'BOLETA'
+  when '08' then 'NOTA DEBITO'
+  ELSE '' END AS "TipoDocumento",
+  comp."Comments",
+  (case  
+   when comp."U_SMC_ESTADO_FE" = '00' AND COMP."CardName" NOT LIKE '%ANULADO%' then 'FALTA'   
+   when comp."U_SMC_ESTADO_FE" = '00' AND COMP."CardName" LIKE '%ANULADO%' then 'RECHAZADO'  
+   when comp."U_SMC_ESTADO_FE" = '01' then 'EMITIDO'   
+   when comp."U_SMC_ESTADO_FE" = '01' AND COMP."CardName" LIKE '%ANULADO%' then 'RECHAZADO'
+   when comp."U_SMC_ESTADO_FE" = '02' then 'ACEPTADO'
+   when comp."U_SMC_ESTADO_FE" = '03' then 'RECHAZADO' 
+   when comp."U_SMC_ESTADO_FE" = '04' then 'ANULADO' 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN 'FALTA'
+  END)  AS "U_SMC_ESTADO_FE",     
+  comp."VatSum",comp."DocTotal",
+  comp."FolioPref",
+  comp."FolioNum",
+  '' dato1,  
+  '' as dato2, '' as dato3
+  ,comp."ObjType" as objectId
+  ,IFNULL(comp."U_SMC_MOTIVOBAJA",'') as Nota
+  ,IFNULL(comp."NumAtCard",'') as ReferenciaSerie,
+  '' as Sucursal
+  FROM oinv comp
+  INNER JOIN ocrd cli on comp."CardCode"=cli."CardCode"
+  LEFT JOIN OBPL T3 ON comp."BPLId"=T3."BPLId"
+  WHERE/* canceled = 'N' */ COMP."CardName" NOT LIKE '%ANULADO%' AND  
+  comp."Indicator"= (CASE WHEN tipodoc  = '*' THEN comp."Indicator"  ELSE   tipodoc END ) and
+  (CASE 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN '00'
+   ELSE IFNULL(comp."U_SMC_ESTADO_FE",'00')
+  END)= (CASE WHEN estado  = '*' THEN (CASE 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN '00'
+   ELSE IFNULL(comp."U_SMC_ESTADO_FE",'00')
+  END) ELSE estado END ) and
+  comp."Indicator" NOT IN ('DI', 'AN')  
+  and comp."DocDate" between fecha1 and fecha2
+  --AND comp."Indicator" IN ('01','03','08','09') 
+   
+  UNION   
+    
+  SELECT 'ODPI' "Tabla", comp."ObjType", comp."DocEntry","DocNum",cli."LicTradNum"  as "Ruc",comp."CardName",comp."DocCur",comp."DocDate",comp."Indicator" as Indicator,
+  case comp."Indicator" when '01' then 'FACTURA ANT'
+  when '03' then 'BOLETA ANT'
+  when '08' then 'NOTA DEBITO'
+  ELSE '' END AS "TipoDocumento",
+  comp."Comments",
+  (case  
+   when comp."U_SMC_ESTADO_FE" = '00' AND COMP."CardName" NOT LIKE '%ANULADO%' then 'FALTA'  
+   when comp."U_SMC_ESTADO_FE" = '00' AND COMP."CardName" LIKE '%ANULADO%' then 'RECHAZADO'  
+   when comp."U_SMC_ESTADO_FE" = '01' then 'EMITIDO'   
+   when comp."U_SMC_ESTADO_FE" = '01' AND COMP."CardName" LIKE '%ANULADO%' then 'RECHAZADO'
+   when comp."U_SMC_ESTADO_FE" = '02' then 'ACEPTADO'
+   when comp."U_SMC_ESTADO_FE" = '03' then 'RECHAZADO' 
+   when comp."U_SMC_ESTADO_FE" = '04' then 'ANULADO' 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN 'FALTA'
+  END)  AS "U_SMC_ESTADO_FE",   
+  comp."VatSum",comp."DocTotal",
+  comp."FolioPref",
+  comp."FolioNum",
+  '' dato1,
+  '' as dato2, '' as dato3
+  ,comp."ObjType" as objectId
+  ,IFNULL(comp."U_SMC_MOTIVOBAJA",'') as Nota
+  ,IFNULL(comp."NumAtCard",'') as ReferenciaSerie,
+  '' as Sucursal
+  FROM ODPI comp  
+  INNER JOIN ocrd cli on comp."CardCode"=cli."CardCode"
+  LEFT JOIN OBPL T3 ON comp."BPLId"=T3."BPLId"
+  WHERE/* canceled = 'N' */ COMP."CardName" NOT LIKE '%ANULADO%' AND  
+  comp."Indicator"= (CASE WHEN tipodoc  = '*' THEN comp."Indicator"  ELSE   tipodoc END ) and
+  (CASE 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN '00'
+   ELSE IFNULL(comp."U_SMC_ESTADO_FE",'00')
+  END)= (CASE WHEN estado  = '*' THEN (CASE 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN '00'
+   ELSE IFNULL(comp."U_SMC_ESTADO_FE",'00')
+  END) ELSE estado END ) and
+  comp."Indicator" NOT IN ('DI', 'AN')  
+  and comp."DocDate" between fecha1 and fecha2
+  --AND comp."Indicator" IN ('01','03','08') 
+    
+  UNION
+
+  select 'ORIN' "Tabla", comp."ObjType", comp."DocEntry","DocNum",cli."LicTradNum" as "Ruc",comp."CardName",comp."DocCur",comp."DocDate",comp."Indicator" as Indicator,
+  case comp."Indicator" when '07' then 'NOTA CREDITO'
+  ELSE '' END AS "TipoDocumento",
+  comp."Comments",
+  (case  
+   when comp."U_SMC_ESTADO_FE" = '00' AND COMP."CardName" NOT LIKE '%ANULADO%' then 'FALTA'  
+   when comp."U_SMC_ESTADO_FE" = '00' AND COMP."CardName" LIKE '%ANULADO%' then 'RECHAZADO'
+   when comp."U_SMC_ESTADO_FE" = '01' then 'EMITIDO'
+   when comp."U_SMC_ESTADO_FE" = '01' AND COMP."CardName" LIKE '%ANULADO%' then 'RECHAZADO'
+   when comp."U_SMC_ESTADO_FE" = '02' then 'ACEPTADO'
+   when comp."U_SMC_ESTADO_FE" = '03' then 'RECHAZADO' 
+   when comp."U_SMC_ESTADO_FE" = '04' then 'ANULADO' 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN 'FALTA'
+  END) AS "U_SMC_ESTADO_FE",   
+  comp."VatSum",comp."DocTotal",
+  comp."FolioPref",
+  comp."FolioNum",
+  '' dato1,
+  '' as dato2, '' as dato3
+  ,comp."ObjType" as objectId
+  ,IFNULL(comp."U_SMC_MOTIVOBAJA",'') as Nota
+  ,IFNULL(comp."NumAtCard",'') as ReferenciaSerie,
+  '' as Sucursal
+  FROM orin comp
+  inner join ocrd cli on comp."CardCode"=cli."CardCode"
+  LEFT JOIN OBPL T3 ON comp."BPLId"=T3."BPLId"
+  INNER JOIN NNM1 T4 ON comp."Series" = T4."Series"
+  where LEFT(T4."SeriesName", 1) IN ('F', 'B')
+  AND canceled = 'N' AND COMP."CardName" NOT LIKE '%ANULADO%' AND
+  comp."Indicator" = (CASE WHEN tipodoc  = '*' THEN comp."Indicator"  ELSE   tipodoc END ) 
+  and (CASE 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN '00'
+   ELSE IFNULL(comp."U_SMC_ESTADO_FE",'00')
+  END)= (CASE WHEN estado  = '*' THEN (CASE 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN '00'
+   ELSE IFNULL(comp."U_SMC_ESTADO_FE",'00')
+  END)  ELSE   estado END )
+  and comp."Indicator" NOT IN ('DI', 'AN') and comp."DocDate" between fecha1 and fecha2  
+  AND SUBSTRING(ifnull(comp."FolioPref",''), 1 , 1) != 'E' 
+  --AND T3."BPLId" = (case when :sucursal = '99' then T3."BPLId" else :sucursal end)
+  
+  UNION ALL
+
+  select *  from(
+  select 'OVPM' "Tabla", comp."ObjType",
+  comp."DocEntry",
+  comp."DocNum",
+  cli."LicTradNum" as "Ruc",
+  comp."CardName",
+  comp."DocCurr",
+  comp."TaxDate" "DocDate",
+  '20' as "Indicator",
+  'RETENCION' AS "TipoDocumento",
+  comp."Comments",
+  (case  
+   when comp."U_SMC_ESTADO_FE" = '00' AND COMP."CardName" NOT LIKE '%ANULADO%' then 'FALTA'   
+   when comp."U_SMC_ESTADO_FE" = '00' AND COMP."CardName" LIKE '%ANULADO%' then 'RECHAZADO'  
+   when comp."U_SMC_ESTADO_FE" = '01' then 'EMITIDO'   
+   when comp."U_SMC_ESTADO_FE" = '01' AND COMP."CardName" LIKE '%ANULADO%' then 'RECHAZADO'
+   when comp."U_SMC_ESTADO_FE" = '02' then 'ACEPTADO'
+   when comp."U_SMC_ESTADO_FE" = '03' then 'RECHAZADO' 
+   when comp."U_SMC_ESTADO_FE" = '04' then 'ANULADO' 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN 'FALTA'
+  END)  AS "U_SMC_ESTADO_FE",
+  comp."VatSum",
+  comp."DocTotal",
+  comp."U_SMC_SERIE_FE",
+  comp."U_SMC_NUM_FE",
+  '' dato1,  
+  '' as dato2, '' as dato3
+  ,comp."ObjType" as objectId
+  ,IFNULL(comp."U_SMC_RETENCION_BAJA",'') as Nota
+  ,'' as ReferenciaSerie,
+  '' as Sucursal 
+  from OVPM comp
+  inner join VPM6 t1 on comp."DocEntry" = t1."DocNum"
+  INNER JOIN ocrd cli on comp."CardCode" = cli."CardCode"
+  LEFT JOIN OBPL T3 ON comp."BPLId" = T3."BPLId"
+  where (CASE 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN '00'
+   ELSE IFNULL(comp."U_SMC_ESTADO_FE",'00')
+  END)= (CASE WHEN estado  = '*' THEN (CASE 
+   WHEN LENGTH(IFNULL(comp."U_SMC_ESTADO_FE",''))=0 THEN '00'
+   ELSE IFNULL(comp."U_SMC_ESTADO_FE",'00')
+  END) ELSE estado END ) 
+  and comp."U_SMC_SERIE_FE" is not null
+  and comp."U_SMC_NUM_FE" is not null
+  --AND T3."BPLId" = (case when :sucursal = '99' then T3."BPLId" else :sucursal end)
+  ) as T 
+  WHERE T."CardName" NOT LIKE '%ANULADO%' 
+  AND T."Indicator" = (CASE WHEN tipodoc  = '*' THEN T."Indicator"  ELSE tipodoc END ) 
+  and T."DocDate" between fecha1 and fecha2
+  and ifnull(T."Comments",'') not like '%Anulado%'
+  and ifnull(T."Comments",'') not like '%Detracciones%'
+  
+  ) as DUMMY
+ where "DocDate" between '20190313' and cast (CURRENT_DATE as date)
+ ORDER BY "DocEntry" DESC;
+END
+</value>
+  </data>
+  <data name="ObtenerADM1" xml:space="preserve">
+    <value>SELECT 
+"ZipCode",
+"Building",
+"County",
+"City",
+(SELECT "Name" FROM OCST WHERE "Code" = T0."State" AND "Country" = T0."Country") "State",
+"Street",
+"IntrntAdrs"
+FROM ADM1 T0</value>
+  </data>
+  <data name="ObtenerAnticipos" xml:space="preserve">
+    <value>SELECT 
+TA."Indicator" AS "tipoDocumento",
+TA."FolioPref" AS "serieDocumento",
+TA."FolioNum" AS "correlativoDocumento",
+(CASE TA."DocCur"
+WHEN 'PEN' THEN TA."DocTotal"
+ELSE TA."DocTotalFC" 
+END) AS "importeDocumento",
+(CASE TA."DocCur"
+WHEN 'PEN' THEN TF."DrawnSum"
+ELSE TF."DrawnSumFc" 
+END) AS totalAnticipos,
+(CASE TA."DocCur"
+WHEN 'PEN' THEN TF."Vat"
+ELSE TF."VatFc"
+END) AS "totalIGVAncticipos",
+TO_NVARCHAR(TA."TaxDate", 'yyyy-MM-dd')
+FROM ODPI TA
+INNER JOIN {0} TF 
+ON TA."DocEntry" = TF."BaseAbs"
+WHERE
+TF."DocEntry" = '{1}'
+AND "CANCELED" = 'N'
+</value>
+  </data>
+  <data name="ObtenerDatosAdicionalesEstela" xml:space="preserve">
+    <value>SELECT
+"U_EXA_TIPNCND",
+"U_EXA_DESMOT"
+FROM {0} T0, OADM T1
+WHERE "DocEntry" = {1}</value>
+  </data>
+  <data name="ObtenerDatosAdicionalesPaperless" xml:space="preserve">
+    <value>SELECT
+ (SELECT "Name" FROM "@EXT_NAVE" A WHERE A."Code" = "U_EXT_NAVE") "U_EXT_NAVE",
+ "U_EXT_CALLNUMBER",
+ "U_EXT_DESRESOLIDA",
+ "U_EXT_OSNRO",
+ "U_EXT_COMENTARIO",
+ (SELECT "Name" FROM "@EXT_MUELLE" A WHERE A."Code" = "U_EXT_MUELLE") "U_EXT_MUELLE",
+ "U_EXT_VIAJE",
+ "U_EXT_FECARRIBO",
+ (SELECT "Name" FROM "@EXT_LINEA" A WHERE A."Code" = "U_EXT_LINEANAV") "U_EXT_LINEANAV",
+ "U_EXT_RESPSOLIDA",
+ "U_EXT_dc_fact_VBWONbr", 
+ T1."Phone1",
+ T1."Fax"
+FROM {0} T0, OADM T1
+WHERE "DocEntry" = {1}</value>
+  </data>
+  <data name="ObtenerDatosAdquiriente" xml:space="preserve">
+    <value>SELECT
+T1."U_EXX_TIPODOCU" AS "tipoIdentificacion",
+T1."LicTradNum" AS "numeroIdentificacion",
+T1."CardName" AS "nombre",
+(SELECT TOP 1 IFNULL(T2."Street",'') || ' - ' || IFNULL(T2."County", '') FROM CRD1 T2  WHERE T2."AdresType" = 'B' AND T2."CardCode" = '{0}' AND T2."Address" = '{1}') AS "direccionFiscal",
+"E_Mail" AS "email",
+T1."Country" AS "codigoPais",
+IFNULL(T1."Phone1", '') as "telefono",
+IFNULL(T1."Fax", '') as "fax",
+(SELECT TOP 1 IFNULL(T2."Street",'') || ' - ' || IFNULL(T2."County", '') FROM CRD1 T2  WHERE T2."AdresType" = 'S' AND T2."CardCode" = '{0}' AND T2."Address" = '{2}') AS "obra"
+FROM OCRD T1
+WHERE T1."CardCode" = '{0}'</value>
+  </data>
+  <data name="ObtenerDatosCPE" xml:space="preserve">
+    <value>SELECT 
+ (CASE WHEN "U_EXX_TIPEXP" = '00' THEN 'N' ELSE 'Y' END) as "documentoExportacion",
+ (CASE WHEN (SELECT COUNT(*) FROM INV1 A WHERE A."DocEntry" = T0."DocEntry" AND A."TaxOnly" = 'Y') &gt; 0 THEN '0' ELSE '1' END)as "TransGratuita",
+ "CardCode",
+ "PayToCode",
+ "ShipToCode",
+ "DocType",
+ "Indicator" as "tipoComprobante",
+ "FolioPref" as "serie",
+ "FolioNum" as "correlativo",
+ --Datos de referencia-----------------------------------------------------------------------------
+ (CASE "Indicator" WHEN '07' THEN "U_SMC_TIPONC_FE"
+    WHEN '08' THEN "U_SMC_TIPOND_FE"
+     ELSE '' END) as "notaTipo",
+   (CASE "Indicator" WHEN '07' THEN "U_SMC_MOTNC_FE"
+    WHEN '08' THEN "U_SMC_MOTND_FE" 
+    ELSE '' END) as "notaSustento",
+ IFNULL("U_EXX_TIPDOCOR", '') as "tipoDocumentoRef",
+ IFNULL("U_EXX_SERDOCOR", '') as "serieRef",
+ IFNULL("U_EXX_CORDOCOR", '') as "correlativoRef",
+ IFNULL(TO_NVARCHAR("DocDueDate", 'yyyy-MM-dd'), '') as "fechaEmisionRef",
+ ---------------------------------------------------------------------------------------------------
+ TO_NVARCHAR("DocDate", 'yyyy-MM-dd') as "fechaEmision",
+ "DocCur" as "tipoMoneda",
+ "DocRate" as "TipoCambio",
+(CASE WHEN IFNULL("U_SMC_TIPOOPERACION_FE", '') = '' 
+     THEN (CASE WHEN "U_EXX_TIPEXP" = '00' THEN (CASE WHEN (SELECT count(*) FROM "INV6" WHERE "DocEntry"=T0."DocEntry" AND UPPER("U_EXX_CONFTIPODET")='SI')&gt;0 THEN '1001' ELSE '0101' END) 
+          ELSE '0200' END)
+       ELSE "U_SMC_TIPOOPERACION_FE" END) AS "tipoOperacion",
+ IFNULL("U_SMC_ORDENCOMPRA_FE", '') as "ordenCompra",
+ TO_DECIMAL((CASE "DocCur" WHEN 'SOL' THEN "RoundDif" 
+                 WHEN 'PEN' THEN "RoundDif" 
+               ELSE "RoundDifFC" END), 15,2) AS "redondeo",
+ TO_NVARCHAR("DocDueDate", 'yyyy-MM-dd') as "fechaVencimiento",
+ (CASE LENGTH("DocTime")
+    WHEN 0 THEN '00:00:00'
+    WHEN 1 THEN '00:0' || "DocTime" || ':00'
+    WHEN 2 THEN '00:' || "DocTime" || ':00'
+    WHEN 3 THEN '0' || SUBSTRING("DocTime", 1, 1) || ':' || SUBSTRING("DocTime", 2, 2) || ':00'
+    WHEN 4 THEN SUBSTRING("DocTime", 1, 2) || ':' || SUBSTRING("DocTime", 3, 2) ||':00'
+ END) as "horaEmision",
+ '0000' as "codigoEstablecimiento",
+ IFNULL("Comments", '') as "observaciones",
+ (CASE WHEN "SlpCode" = -1 THEN '' ELSE (SELECT A."SlpName" FROM OSLP A WHERE A."SlpCode" = T0."SlpCode") END) as "vendedor",
+ (SELECT (CASE WHEN A."ExtraDays" = 0 THEN 'Contado' ELSE 'Credito' END) FROM OCTG A WHERE A."GroupNum" = T0."GroupNum") as "condicionPago",
+ (SELECT "PymntGroup" FROM OCTG A WHERE A."GroupNum" = T0."GroupNum") as "condicionPagoDesc",
+ TO_DECIMAL((CASE T0."DocCur" WHEN 'SOL' THEN T0."DiscSum" WHEN 'PEN' THEN T0."DocTotal" ELSE T0."DocTotalFC" END), 15,2) "importeTotal",
+ TO_DECIMAL((CASE T0."DocCur" WHEN 'SOL' THEN T0."DiscSum" WHEN 'PEN' THEN T0."DpmAmnt" ELSE T0."DpmAmntFC" END), 15,2) AS "valorTotalAnticipos",
+ TO_DECIMAL((CASE T0."DocCur" WHEN 'SOL' THEN T0."DiscSum" WHEN 'PEN' THEN T0."DpmVat" ELSE T0."DpmVatFc" END), 15,2) AS "valorTotalIGVAnticipos",
+ TO_DECIMAL((CASE T0."DocCur" WHEN 'SOL' THEN T0."DiscSum" WHEN 'PEN' THEN T0."DiscSum" ELSE T0."DiscSumFC" END), 15,2) AS "valorDescuentoGlobal",
+ "Comments",
+ T1."Phone1",
+ T1."Fax",
+(SELECT IFNULL("U_EXX_ESCRED", 'N') FROM OCTG WHERE "GroupNum" = T0."GroupNum") "Credito",
+(CASE WHEN (SELECT count(*) FROM "INV6" WHERE "DocEntry"=T0."DocEntry" AND UPPER("U_EXX_CONFTIPODET")='SI')&gt;0 THEN 'Y' ELSE 'N' END)  as "TieneDetraccion",
+(CASE WHEN (SELECT count(*) FROM "INV6" WHERE "DocEntry"=T0."DocEntry" AND UPPER("U_EXX_CONFTIPODET")='SI')&gt;0 THEN (select MAX(T00."U_EXX_GRUPODET") from "INV1" T00 WHERE T00."DocEntry"=T0."DocEntry" )
+   ELSE '' END) as "codigoDetraccion",
+(CASE WHEN (SELECT count(*) FROM "INV6" WHERE "DocEntry"=T0."DocEntry" AND UPPER("U_EXX_CONFTIPODET")='SI')&gt;0 THEN (select MAX(T00."InsTotal") from "INV6" T00 WHERE T00."DocEntry"=T0."DocEntry" AND UPPER(T00."U_EXX_CONFTIPODET")='SI')
+   ELSE 0 END) as "totalDetraccion",
+(CASE WHEN (SELECT count(*) FROM "INV6" WHERE "DocEntry"=T0."DocEntry" AND UPPER("U_EXX_CONFTIPODET")='SI')&gt;0 THEN (select (CASE T0."DocCur" WHEN 'SOL' THEN MAX(T00."InsTotal") WHEN 'PEN' THEN MAX(T00."InsTotal") ELSE MAX(T00."InsTotalFC") END) from "INV6" T00 WHERE T00."DocEntry"=T0."DocEntry" AND UPPER(T00."U_EXX_CONFTIPODET")='SI')
+   ELSE 0 END) as "totalDetraccionMD",
+(CASE WHEN (SELECT count(*) FROM "INV6" WHERE "DocEntry"=T0."DocEntry" AND UPPER("U_EXX_CONFTIPODET")='SI')&gt;0 THEN (select MAX(T00."InstPrcnt") from "INV6" T00 WHERE T00."DocEntry"=T0."DocEntry" AND UPPER(T00."U_EXX_CONFTIPODET")='SI')
+   ELSE 0 END)/100 as "porcentajeDetraccion",
+(SELECT "U_NAME" FROM OUSR A WHERE T0."UserSign" = A."USERID") "Responsable" 
+FROM {0} T0, OADM T1
+WHERE "DocEntry" = {1}</value>
+  </data>
+  <data name="ObtenerDetalleDocumento" xml:space="preserve">
+    <value>SELECT 
+ T0."DocCur",
+ T1."ItemCode" as "codigoArt",
+ T1."AcctCode" as "descripcionServ",
+ T1."Dscription" as "descripcion",
+ T1."Quantity" AS "cantidadUnidades",
+ (CASE WHEN IFNULL(T1."unitMsr", '') = '' THEN 'UND' ELSE T1."unitMsr" END) as "unidadMedidaSAP",
+ IFNULL(T2."U_EXX_TIPOUMED", 'NIU') as "unidadMedida",
+ T1."Price" AS "valorUnitario",
+ T1."PriceAfVAT" AS "precioUnitario",
+ (CASE T0."DocCur" WHEN 'SOL' THEN T1."LineTotal" WHEN 'PEN' THEN T1."LineTotal" ELSE T1."TotalFrgn" END) AS "valorItem",
+ T1."TaxCode" as "CodigoImpuesto",
+ T1."VatPrcnt" AS "tasaIGV",
+ T1."Rate",
+ T1."Price",
+ (CASE T0."DocCur" WHEN 'SOL' THEN T1."VatSum" WHEN 'PEN' THEN T1."VatSum" ELSE T1."VatSumFrgn" END) AS "montoIGV", 
+ T1."DiscPrcnt",
+ T1."TaxOnly",
+ T1."U_SMC_TIPOAFECT_FE",
+ (SELECT "OcrName" FROM OOCR WHERE "OcrCode" = T1."OcrCode2") AS "Operacion",
+ (SELECT "Name" FROM "@EXT_CONDCARGA" WHERE "Code" = T1."U_EXT_CONDCARGA") AS "CondicionCarga",
+ (SELECT "Name" FROM "@EXT_TAMCONTENEDOR" WHERE "Code" = T1."U_EXT_TAMCONTENEDOR") AS "Tamaño"
+FROM "{0}" T0
+INNER JOIN "{1}1" T1 ON T0."DocEntry" = T1."DocEntry"
+INNER JOIN "OITM" T2 ON T1."ItemCode" = T2."ItemCode"
+WHERE T0."DocEntry" = {2}
+--GROUP BY T0."DocCur", T1."ItemCode", T1."AcctCode", T1."Dscription", T1."unitMsr", T1."VatPrcnt", T1."TaxCode",
+--T1."Rate", T1."Price", T1."PriceAfVAT", T1. "DiscPrcnt", T1."TaxOnly",T1."U_SMC_TIPOAFECT_FE", T1."LineNum",T2."U_EXX_TIPOUMED"
+ORDER BY T1."LineNum"</value>
+  </data>
+  <data name="ObtenerMonedas" xml:space="preserve">
+    <value>SELECT "CurrCode", "CurrName", "ISOCurrCod" FROM OCRN
+</value>
+  </data>
+</root>

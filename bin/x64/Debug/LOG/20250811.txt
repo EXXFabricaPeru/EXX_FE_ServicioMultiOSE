@@ -1,0 +1,25 @@
+SBO_TPE_DESARROLLO 10:14:37-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 10:30:28-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 10:33:55-(: )-Error al asignar folio Número SAP(20000168): (13) EXX: La serie de la factura es distinta al Nro de Serie Factura".
+SBO_TPE_DESARROLLO 10:35:15-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 11:08:29-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 11:53:10-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 12:14:30-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 12:21:15-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 12:21:17-(: )-Error al asignar folio Número SAP(20000168): (13) EXX: La serie de la factura es distinta al Nro de Serie Factura".
+SBO_TPE_DESARROLLO 12:55:34-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 12:56:01-(: )-Error al asignar folio Número SAP(20000168): (13) EXX: La serie de la factura es distinta al Nro de Serie Factura".
+SBO_TPE_DESARROLLO 12:58:37-(: )-Error al asignar folio Número SAP(20000168): (13) EXX: Tiene que completar la columna Detracción. [Línea: 1]
+SBO_TPE_DESARROLLO 13:00:30-(: )-Error al asignar folio Número SAP(20000168): (13) EXX: Tiene que completar la columna Detracción. [Línea: 1]
+SBO_TPE_DESARROLLO 13:00:47-(: )-FACTURA--0: 1). [SAP AG][LIBODBCHDB DLL][HDBODBC] General error;277 not a GROUP BY expression: 'T1.OcrCode2' must be in group by clause.: line 20 col 48 (at pos 873)
+
+SBO_TPE_DESARROLLO 13:00:49-(: )-FACTURA--0: 1). [SAP AG][LIBODBCHDB DLL][HDBODBC] General error;277 not a GROUP BY expression: 'T1.OcrCode2' must be in group by clause.: line 20 col 48 (at pos 873)
+
+SBO_TPE_DESARROLLO 13:02:29-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 13:03:15-(: )-FACTURA-F002-224519: Documento ha sido enviado con éxito
+SBO_TPE_DESARROLLO 13:03:38-(: )-FACTURA-F001-224543: Documento ha sido enviado con éxito
+SBO_TPE_DESARROLLO 13:44:13-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 13:44:46-(: )-FACTURA--0: Column 'Tamano' does not belong to table dtDetalle.
+SBO_TPE_DESARROLLO 13:46:45-(: )-FACTURA-F001-224544: Documento ha sido enviado con éxito
+SBO_TPE_DESARROLLO 14:07:04-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 14:08:12-(: )-FACTURA--0: Documento ha sido enviado con éxito

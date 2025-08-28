@@ -1,0 +1,12 @@
+﻿[
+  {
+    "DbServerType": 9,
+    "Server": "NDB@10.10.70.134:30013",
+    "CompanyDB": "SBO_TPE_DESARROLLO",
+    "DbUserName": "SAPINST",
+    "DbPassword": "Passw0rd",
+    "LicenseServer": "NDB@10.10.70.134:50000",
+    "UserName": "manager",
+    "Password": "m1r1"
+  }
+]

@@ -1,0 +1,3 @@
+SBO_TPE_DESARROLLO 12:57:12-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 12:57:31-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 12:59:22-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP

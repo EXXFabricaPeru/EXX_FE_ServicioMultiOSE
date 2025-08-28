@@ -1,0 +1,5 @@
+SBO_TPE_DESARROLLO 12:22:58-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 12:29:06-(: )-FACTURA--0: Documento ha sido enviado con éxito
+SBO_TPE_DESARROLLO 12:32:50-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 12:34:06-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 13:48:16-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP

@@ -1,0 +1,3 @@
+SBO_TPE_DESARROLLO 11:01:39-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 13:14:04-(: )-Servicio conectado a la base SBO_TPE_DESARROLLO de SAP
+SBO_TPE_DESARROLLO 13:17:20-(: )-Error al asignar folio FC01-224370 al documento SAP 10000018: 10000510 - El número de folio ya se está utilizando; en el campo "Número de folio" introduzca un número unívoco

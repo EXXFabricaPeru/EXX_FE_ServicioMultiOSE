@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://www.dbnet.cl" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://www.dbnet.cl" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.dbnet.cl">
+      <s:element name="getDocumentoPDF">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="_ruttEmpr" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_folioDTE" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_tipoDTE" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_serieInte" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_fechaDTE" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_monTotal" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getDocumentoPDFResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getDocumentoPDFResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="getDocumentoXML">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="_ruttEmpr" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_folioDTE" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_tipoDTE" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_serieInte" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_fechaDTE" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_monTotal" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getDocumentoXMLResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getDocumentoXMLResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getDocumentoCDR">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="_ruttEmpr" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_folioDTE" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_tipoDTE" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_serieInte" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_fechaDTE" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="_monTotal" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getDocumentoCDRResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getDocumentoCDRResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ObtnerVersion">
+        <s:complexType />
+      </s:element>
+      <s:element name="ObtnerVersionResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ObtnerVersionResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="getDocumentoPDFSoapIn">
+    <wsdl:part name="parameters" element="tns:getDocumentoPDF" />
+  </wsdl:message>
+  <wsdl:message name="getDocumentoPDFSoapOut">
+    <wsdl:part name="parameters" element="tns:getDocumentoPDFResponse" />
+  </wsdl:message>
+  <wsdl:message name="getDocumentoXMLSoapIn">
+    <wsdl:part name="parameters" element="tns:getDocumentoXML" />
+  </wsdl:message>
+  <wsdl:message name="getDocumentoXMLSoapOut">
+    <wsdl:part name="parameters" element="tns:getDocumentoXMLResponse" />
+  </wsdl:message>
+  <wsdl:message name="getDocumentoCDRSoapIn">
+    <wsdl:part name="parameters" element="tns:getDocumentoCDR" />
+  </wsdl:message>
+  <wsdl:message name="getDocumentoCDRSoapOut">
+    <wsdl:part name="parameters" element="tns:getDocumentoCDRResponse" />
+  </wsdl:message>
+  <wsdl:message name="ObtnerVersionSoapIn">
+    <wsdl:part name="parameters" element="tns:ObtnerVersion" />
+  </wsdl:message>
+  <wsdl:message name="ObtnerVersionSoapOut">
+    <wsdl:part name="parameters" element="tns:ObtnerVersionResponse" />
+  </wsdl:message>
+  <wsdl:portType name="consultaDocumentosPeruSoap">
+    <wsdl:operation name="getDocumentoPDF">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Permite la obtención del PDF de un Documento Electrónico</wsdl:documentation>
+      <wsdl:input message="tns:getDocumentoPDFSoapIn" />
+      <wsdl:output message="tns:getDocumentoPDFSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getDocumentoXML">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Permite la obtención del XML de un Documento Electrónico</wsdl:documentation>
+      <wsdl:input message="tns:getDocumentoXMLSoapIn" />
+      <wsdl:output message="tns:getDocumentoXMLSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getDocumentoCDR">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Permite la obtención del CDR de un Documento Electrónico</wsdl:documentation>
+      <wsdl:input message="tns:getDocumentoCDRSoapIn" />
+      <wsdl:output message="tns:getDocumentoCDRSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ObtnerVersion">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Permite la obtención del último número de versión</wsdl:documentation>
+      <wsdl:input message="tns:ObtnerVersionSoapIn" />
+      <wsdl:output message="tns:ObtnerVersionSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="consultaDocumentosPeruSoap" type="tns:consultaDocumentosPeruSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getDocumentoPDF">
+      <soap:operation soapAction="http://www.dbnet.cl/getDocumentoPDF" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDocumentoXML">
+      <soap:operation soapAction="http://www.dbnet.cl/getDocumentoXML" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDocumentoCDR">
+      <soap:operation soapAction="http://www.dbnet.cl/getDocumentoCDR" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObtnerVersion">
+      <soap:operation soapAction="http://www.dbnet.cl/ObtnerVersion" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="consultaDocumentosPeruSoap12" type="tns:consultaDocumentosPeruSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getDocumentoPDF">
+      <soap12:operation soapAction="http://www.dbnet.cl/getDocumentoPDF" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDocumentoXML">
+      <soap12:operation soapAction="http://www.dbnet.cl/getDocumentoXML" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDocumentoCDR">
+      <soap12:operation soapAction="http://www.dbnet.cl/getDocumentoCDR" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObtnerVersion">
+      <soap12:operation soapAction="http://www.dbnet.cl/ObtnerVersion" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="consultaDocumentosPeru">
+    <wsdl:port name="consultaDocumentosPeruSoap" binding="tns:consultaDocumentosPeruSoap">
+      <soap:address location="https://pruebas.ecomprobantes.pe/wssConsultaDocPeru/consultaDocumentosPeru.asmx" />
+    </wsdl:port>
+    <wsdl:port name="consultaDocumentosPeruSoap12" binding="tns:consultaDocumentosPeruSoap12">
+      <soap12:address location="https://pruebas.ecomprobantes.pe/wssConsultaDocPeru/consultaDocumentosPeru.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

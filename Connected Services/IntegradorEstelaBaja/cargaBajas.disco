@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="https://pruebas.ecomprobantes.pe/wssCargaBajas/cargaBajas.asmx?wsdl" docRef="https://pruebas.ecomprobantes.pe/wssCargaBajas/cargaBajas.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="https://pruebas.ecomprobantes.pe/wssCargaBajas/cargaBajas.asmx" xmlns:q1="http://www.dbnet.cl" binding="q1:WssCargaBajasSoap" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="https://pruebas.ecomprobantes.pe/wssCargaBajas/cargaBajas.asmx" xmlns:q2="http://www.dbnet.cl" binding="q2:WssCargaBajasSoap12" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>

@@ -1,0 +1,229 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\EXX_DEV\\ServicioConectorFE\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|c:\\exx_dev\\servicioconectorfe\\core\\main.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:core\\main.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\core\\structure.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:core\\structure.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\ose\\paperless.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:ose\\paperless.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\functionality\\documento.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:functionality\\documento.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\framework\\sapdi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:framework\\sapdi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\functionality\\estado.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:functionality\\estado.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\core\\setup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:core\\setup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\core\\globals.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:core\\globals.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\ose\\bizlinks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:ose\\bizlinks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\ose\\estela.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:ose\\estela.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\setupfields\\config.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:setupfields\\config.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\servicioconector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:servicioconector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|C:\\EXX_DEV\\ServicioConectorFE\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{70098F04-5099-4437-9CE9-8C7592B360B3}|ServicioConectorFE.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 12,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Globals.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\Core\\Globals.cs",
+              "RelativeDocumentMoniker": "Core\\Globals.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\Core\\Globals.cs",
+              "RelativeToolTip": "Core\\Globals.cs",
+              "ViewState": "AgIAAFcAAAAAAAAAAAAqwGcAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T17:17:06.972Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Bizlinks.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\OSE\\Bizlinks.cs",
+              "RelativeDocumentMoniker": "OSE\\Bizlinks.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\OSE\\Bizlinks.cs",
+              "RelativeToolTip": "OSE\\Bizlinks.cs",
+              "ViewState": "AgIAABgDAAAAAAAAAAD4vxsDAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T17:16:06.933Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Setup.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\Core\\Setup.cs",
+              "RelativeDocumentMoniker": "Core\\Setup.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\Core\\Setup.cs",
+              "RelativeToolTip": "Core\\Setup.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAwwBQAAACgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-13T15:47:06.073Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Structure.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\Core\\Structure.cs",
+              "RelativeDocumentMoniker": "Core\\Structure.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\Core\\Structure.cs",
+              "RelativeToolTip": "Core\\Structure.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAqwBcAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T16:43:05.49Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Estela.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\OSE\\Estela.cs",
+              "RelativeDocumentMoniker": "OSE\\Estela.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\OSE\\Estela.cs",
+              "RelativeToolTip": "OSE\\Estela.cs",
+              "ViewState": "AgIAACMDAAAAAAAAAAAMwDADAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-08T22:54:42.205Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ServicioConector.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\ServicioConector.cs",
+              "RelativeDocumentMoniker": "ServicioConector.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\ServicioConector.cs",
+              "RelativeToolTip": "ServicioConector.cs",
+              "ViewState": "AgIAADoAAAAAAAAAAAAvwEsAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-08T16:29:32.951Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAQwBIAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-08T16:29:19.881Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Config.json",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\SetupFields\\Config.json",
+              "RelativeDocumentMoniker": "SetupFields\\Config.json",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\SetupFields\\Config.json",
+              "RelativeToolTip": "SetupFields\\Config.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-01T15:29:36.355Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "SAPDI.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\Framework\\SAPDI.cs",
+              "RelativeDocumentMoniker": "Framework\\SAPDI.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\Framework\\SAPDI.cs",
+              "RelativeToolTip": "Framework\\SAPDI.cs",
+              "ViewState": "AgIAAFYDAAAAAAAAAAAQwGsDAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-18T22:47:25.373Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Paperless.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\OSE\\Paperless.cs",
+              "RelativeDocumentMoniker": "OSE\\Paperless.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\OSE\\Paperless.cs",
+              "RelativeToolTip": "OSE\\Paperless.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAANMDAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-17T14:47:56.517Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Estado.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\Functionality\\Estado.cs",
+              "RelativeDocumentMoniker": "Functionality\\Estado.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\Functionality\\Estado.cs",
+              "RelativeToolTip": "Functionality\\Estado.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAqwB8AAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-18T17:15:40.876Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Documento.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\Functionality\\Documento.cs",
+              "RelativeDocumentMoniker": "Functionality\\Documento.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\Functionality\\Documento.cs",
+              "RelativeToolTip": "Functionality\\Documento.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAqwBoAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-10T16:14:56.555Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Main.cs",
+              "DocumentMoniker": "C:\\EXX_DEV\\ServicioConectorFE\\Core\\Main.cs",
+              "RelativeDocumentMoniker": "Core\\Main.cs",
+              "ToolTip": "C:\\EXX_DEV\\ServicioConectorFE\\Core\\Main.cs",
+              "RelativeToolTip": "Core\\Main.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAD4vxkAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-10T15:49:16.621Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

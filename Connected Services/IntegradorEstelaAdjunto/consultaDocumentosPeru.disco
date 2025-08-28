@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="https://pruebas.ecomprobantes.pe/wssConsultaDocPeru/consultaDocumentosPeru.asmx?wsdl" docRef="https://pruebas.ecomprobantes.pe/wssConsultaDocPeru/consultaDocumentosPeru.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="https://pruebas.ecomprobantes.pe/wssConsultaDocPeru/consultaDocumentosPeru.asmx" xmlns:q1="http://www.dbnet.cl" binding="q1:consultaDocumentosPeruSoap" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="https://pruebas.ecomprobantes.pe/wssConsultaDocPeru/consultaDocumentosPeru.asmx" xmlns:q2="http://www.dbnet.cl" binding="q2:consultaDocumentosPeruSoap12" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>
