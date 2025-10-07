@@ -99,8 +99,10 @@ namespace ServicioConectorFE.Functionality
                                             rptaRegistrar = OSE.Nubefact.RegistrarDocumento(document.NumeroSAP, document.ObjectId, document.CodTipoDoc, document.Tabla, document.DocEntry, ref EstadoDocumento, ref Folio, ref mensajeError);
                                             break;
                                         case "09":
+                                            rptaRegistrar = OSE.Nubefact.RegistrarGuia(document.NumeroSAP, document.ObjectId, document.CodTipoDoc, document.Tabla, document.DocEntry, ref EstadoDocumento, ref Folio, ref mensajeError);
                                             break;
                                         case "20":
+                                            rptaRegistrar = OSE.Nubefact.RegistrarRetencion(document.NumeroSAP, document.ObjectId, document.CodTipoDoc, document.Tabla, document.DocEntry, ref EstadoDocumento, ref Folio, ref mensajeError);
                                             break;
                                     }
                                     break;
@@ -122,7 +124,6 @@ namespace ServicioConectorFE.Functionality
                                         Globals.Log(document.TipoDocumento + "-" + document.Serie + "-" + document.Correlativo + ": " + document.Nota);
                                         break;
                                 }
-
                             }
                             else
                             {
