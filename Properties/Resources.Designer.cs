@@ -61,6 +61,40 @@ namespace ServicioConectorFE.Properties {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a PROCEDURE &quot;EXX_ActualizarEstadoFE&quot; 
+        ///(
+        /// IN DocEntry INT,
+        /// IN ObjectType varchar(5),
+        /// IN MensajeError CLOB,
+        /// IN Estado varchar(150)
+        ///) 
+        ///LANGUAGE SQLSCRIPT 
+        ///AS 
+        ///BEGIN
+        /// DECLARE EstadoFE VARCHAR(10);
+        /// 
+        /// SELECT 
+        /// (CASE 
+        ///  WHEN Estado=&apos;AC_03&apos; THEN &apos;02&apos;
+        ///  WHEN Estado=&apos;RC_05&apos; THEN &apos;03&apos;
+        ///  WHEN Estado=&apos;PE_02&apos; THEN &apos;01&apos;
+        ///  WHEN Estado=&apos;01&apos; THEN &apos;01&apos;
+        ///  WHEN Estado=&apos;02&apos; THEN &apos;02&apos;
+        ///  WHEN Estado=&apos;03&apos; THEN &apos;03&apos;
+        ///  WHEN Estado=&apos;04&apos; THEN &apos;04&apos;
+        ///  ELSE &apos;00&apos;
+        ///  END )into  EstadoFE
+        /// FROM dummy;
+        /// 
+        /// IF ObjectTyp [resto de la cadena truncado]&quot;;.
+        /// </summary>
+        internal static string EXX_ActualizarEstadoFE {
+            get {
+                return ResourceManager.GetString("EXX_ActualizarEstadoFE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a PROCEDURE &quot;EXX_COMPROBANTES_ELECTRONICOS&quot;
         ///(
         /// IN Fecha1 date,
@@ -82,6 +116,41 @@ namespace ServicioConectorFE.Properties {
         internal static string EXX_COMPROBANTES_ELECTRONICOS {
             get {
                 return ResourceManager.GetString("EXX_COMPROBANTES_ELECTRONICOS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        internal static string EXX_RETENCION_DETALLE_FE {
+            get {
+                return ResourceManager.GetString("EXX_RETENCION_DETALLE_FE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a CREATE PROCEDURE &quot;EXX_RETENCION_FE&quot;
+        ///(
+        /// IN DocEntry INT -- Error string to be displayed
+        ///)
+        ///LANGUAGE SQLSCRIPT AS
+        ///BEGIN
+        ///
+        /// SELECT 
+        /// IFNULL(T3.&quot;GlblLocNum&quot;, T4.&quot;TaxIdNum&quot;) as idEmisor,
+        /// 20 as tipoDocumento,
+        /// T0.&quot;U_EXX_SERIE_FE&quot; as Serie,
+        /// T0.&quot;U_EXX_NUM_FE&quot;  as Correlativo,
+        /// IFNULL(T3.&quot;GlblLocNum&quot;, T4.&quot;E_Mail&quot;) as correoEmisor,
+        /// IFNULL(T2.&quot;E_Mail&quot;, &apos;&apos;) as correoAdquiriente,
+        /// 
+        /// 
+        /// IFNULL(T0.&quot;U_EXX_SERIE_FE&quot;,&apos;&apos;)||&apos;-&apos;|| LPAD(ifnull(TO_VARCHAR(T0.&quot;U_EXX_NUM_FE&quot;),&apos;&apos;),8,&apos;0&apos;) as serieNumeroRetencion, 
+        /// T [resto de la cadena truncado]&quot;;.
+        /// </summary>
+        internal static string EXX_RETENCION_FE {
+            get {
+                return ResourceManager.GetString("EXX_RETENCION_FE", resourceCulture);
             }
         }
         
@@ -177,7 +246,8 @@ namespace ServicioConectorFE.Properties {
         ///T1.&quot;Country&quot; AS &quot;codigoPais&quot;,
         ///IFNULL(T1.&quot;Phone1&quot;, &apos;&apos;) as &quot;telefono&quot;,
         ///IFNULL(T1.&quot;Fax&quot;, &apos;&apos;) as &quot;fax&quot;,
-        ///(SELECT TOP 1 IFNULL(T2.&quot;Street&quot;,&apos;&apos;) || &apos; - &apos; || IFNULL(T2.&quot;County&quot;, &apos;&apos;) [resto de la cadena truncado]&quot;;.
+        ///T1.&quot;GlblLocNum&quot;,
+        ///(SELECT TOP 1 IFNULL(T2.&quot;Street&quot;,&apos;&apos;) || &apos; - &apos; || IFNUL [resto de la cadena truncado]&quot;;.
         /// </summary>
         internal static string ObtenerDatosAdquiriente {
             get {
@@ -225,12 +295,58 @@ namespace ServicioConectorFE.Properties {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a SELECT 
+        /// T0.&quot;DocCur&quot;,
+        /// T1.&quot;ItemCode&quot; as &quot;codigoArt&quot;,
+        /// T1.&quot;AcctCode&quot; as &quot;descripcionServ&quot;,
+        /// T1.&quot;Dscription&quot; as &quot;descripcion&quot;,
+        /// T1.&quot;Quantity&quot; AS &quot;cantidadUnidades&quot;,
+        /// (CASE WHEN IFNULL(T1.&quot;unitMsr&quot;, &apos;&apos;) = &apos;&apos; THEN &apos;UND&apos; ELSE T1.&quot;unitMsr&quot; END) as &quot;unidadMedidaSAP&quot;,
+        /// IFNULL(T2.&quot;U_EXX_TIPOUMED&quot;, &apos;NIU&apos;) as &quot;unidadMedida&quot;,
+        /// T1.&quot;Price&quot; AS &quot;valorUnitario&quot;,
+        /// T1.&quot;PriceAfVAT&quot; AS &quot;precioUnitario&quot;,
+        /// (CASE T0.&quot;DocCur&quot; WHEN &apos;SOL&apos; THEN T1.&quot;LineTotal&quot; WHEN &apos;PEN&apos; THEN T1.&quot;LineTotal&quot; ELSE T1.&quot;TotalFrgn&quot; END) AS &quot;valorI [resto de la cadena truncado]&quot;;.
+        /// </summary>
+        internal static string ObtenerDetalleEstela {
+            get {
+                return ResourceManager.GetString("ObtenerDetalleEstela", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a SELECT &quot;CurrCode&quot;, &quot;CurrName&quot;, &quot;ISOCurrCod&quot; FROM OCRN
         ///.
         /// </summary>
         internal static string ObtenerMonedas {
             get {
                 return ResourceManager.GetString("ObtenerMonedas", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a ALTER PROCEDURE &quot;SMC_RETENCION_DETALLE_FE&quot;
+        ///(
+        /// IN DocEntry INT -- Error string to be displayed
+        ///)
+        ///LANGUAGE SQLSCRIPT AS
+        ///BEGIN
+        /// DECLARE FechaPago DATE;
+        /// DECLARE TipoCambio DECIMAL;
+        /// DECLARE TotalDocSinRet DECIMAL;
+        /// 
+        /// SELECT 
+        /// &quot;TaxDate&quot; into FechaPago
+        /// FROM &quot;OVPM&quot; T0 WHERE &quot;DocEntry&quot;=DocEntry;
+        /// 
+        /// select &quot;Rate&quot; into TipoCambio FROM &quot;ORTT&quot; WHERE &quot;Currency&quot;=&apos;USD&apos; and &quot;RateDate&quot;=FechaPago;
+        /// 
+        /// IF EXISTS (SELECT 1 FROM &quot;OVPM&quot; T0 
+        ///      INNER JOIN &quot;VPM2&quot; T1 ON T0.&quot;DocEntry&quot; = T1.&quot;DocNum&quot;
+        ///      WHERE  [resto de la cadena truncado]&quot;;.
+        /// </summary>
+        internal static string SMC_RETENCION_DETALLE_FE {
+            get {
+                return ResourceManager.GetString("SMC_RETENCION_DETALLE_FE", resourceCulture);
             }
         }
     }

@@ -18,6 +18,7 @@ using ServicioConectorFE.OSE;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Security.AccessControl;
 using System.Security.Permissions;
+using System.Globalization;
 
 namespace ServicioConectorFE.Framework
 {
@@ -184,11 +185,12 @@ namespace ServicioConectorFE.Framework
 
                 if (Globals.oRec.RecordCount > 0)
                 {
-                    Globals.URL_OSE = Globals.oRec.Fields.Item("U_MIX_WSDOCURL").Value.ToString();
+                    Globals.URL_OSE = Globals.oRec.Fields.Item("U_EXX_WSDOCURL").Value.ToString();
                     Globals.SFTP_IP = Globals.oRec.Fields.Item("U_EXX_SFTPIP").Value.ToString();
-                    Globals.SFTP_PORT = Convert.ToInt32(Globals.oRec.Fields.Item("U_EXX_SPUERTO").Value.ToString());
+                    //Globals.SFTP_PORT = Convert.ToInt32(Globals.oRec.Fields.Item("U_EXX_SPUERTO").Value.ToString());
                     Globals.SFTP_USER = Globals.oRec.Fields.Item("U_EXX_SUSER").Value.ToString();
                     Globals.SFTP_PASS = Globals.oRec.Fields.Item("U_EXX_SPASS").Value.ToString();
+                    Globals.TOKEN = Globals.oRec.Fields.Item("U_EXX_WSTOKEN").Value.ToString();
 
                     Globals.ProveedorOSE = Globals.oRec.Fields.Item("U_EXX_OSE").Value.ToString();
                     Globals.PathArchivos = Globals.oRec.Fields.Item("U_EXX_PATH").Value.ToString();
@@ -291,7 +293,7 @@ namespace ServicioConectorFE.Framework
         {
             FolioNum = "0";
             FolioPref = "0";
-            string nombre_Store = "SMC_Actualizar_FELFolioPrefNumFactAnt";
+            string nombre_Store = "EXX_Actualizar_FELFolioPrefNumFactAnt";
             SAPbobsCOM.Recordset oRecFE = default(SAPbobsCOM.Recordset);
 
             string Query = "";
@@ -329,7 +331,7 @@ namespace ServicioConectorFE.Framework
 
         public static void Update_Folio_Fact(string TipoDoc, int DocNum, int ObjectType, int DocEntry, ref string FolioPref, ref string FolioNum)
         {
-            string nombre_Store = "SMC_Actualizar_FELFolioPrefNumOINV";
+            string nombre_Store = "EXX_Actualizar_FELFolioPrefNumOINV";
             SAPbobsCOM.Recordset oRecFE = default(SAPbobsCOM.Recordset);
             string Query = "";
             try
@@ -367,7 +369,7 @@ namespace ServicioConectorFE.Framework
         public static void Update_Folio_NotaCredito(string TipoDoc, int DocNum, int ObjectType, int DocEntry, ref string FolioPref, ref string FolioNum)
         {
 
-            string nombre_Store = "SMC_Actualizar_FELFolioPrefNumORIN";
+            string nombre_Store = "EXX_Actualizar_FELFolioPrefNumORIN";
             SAPbobsCOM.Recordset oRecFE = default(SAPbobsCOM.Recordset);
             string Query = "";
             try
@@ -403,8 +405,8 @@ namespace ServicioConectorFE.Framework
 
         public static bool ActualizarFolioRetencion(int Docentry)
         {
-            string nombre_Store = "SMC_Actualizar_FolioRetencion";
-            SAPbobsCOM.Recordset oRecFE = default(SAPbobsCOM.Recordset);
+            string nombre_Store = "EXX_Actualizar_FolioRetencion";
+            SAPbobsCOM.Recordset oRecFE = default(SAPbobsCOM.Recordset); 
             string Query = "";
             try
             {
@@ -474,7 +476,7 @@ namespace ServicioConectorFE.Framework
                     oitem.ObjectId = Convert.ToInt32(Globals.oRec.Fields.Item("objectId").Value.ToString());
 
 
-                    oitem.Estado = Globals.oRec.Fields.Item("U_SMC_ESTADO_FE").Value.ToString();
+                    oitem.Estado = Globals.oRec.Fields.Item("U_EXX_ESTADO_FE").Value.ToString();
 
                     oitem.Impuesto = string.Format("{0:N}", Convert.ToDecimal(Globals.oRec.Fields.Item("VatSum").Value.ToString()));
                     oitem.ImporteTotal = string.Format("{0:N}", Convert.ToDecimal(Globals.oRec.Fields.Item("DocTotal").Value.ToString()));
@@ -593,14 +595,13 @@ namespace ServicioConectorFE.Framework
             }
         }
 
-        public static void ObtenerDatosCRE(int DocEntry, ref DocumentoRetencionFE oDocumentoFE)
+        public static void ObtenerDatosCRE(int DocEntry, ref Retencion oDocumentoFE)
         {
-            string nombre_Store = "SMC_RETENCION_FE";
-            string nombre_Store1 = "SMC_RETENCION_DETALLE_FE";
-
+            string nombre_Store = "EXX_RETENCION_FE";
+            string nombre_Store1 = "EXX_RETENCION_DETALLE_FE";
 
             string Query = "";
-            oDocumentoFE = new DocumentoRetencionFE();
+            oDocumentoFE = new Retencion();
 
             try
             {
@@ -1013,7 +1014,11 @@ namespace ServicioConectorFE.Framework
         {
             try
             {
-                Globals.Query = ServicioConectorFE.Properties.Resources.ObtenerDetalleDocumento;
+                if (Globals.ProveedorOSE == "3")
+                    Globals.Query = ServicioConectorFE.Properties.Resources.ObtenerDetalleEstela;
+                else
+                    Globals.Query = ServicioConectorFE.Properties.Resources.ObtenerDetalleDocumento;
+
                 Globals.Query = String.Format(Globals.Query, SAPTable, SAPTable.Substring(1, 3), docEntry);
                 Globals.RunQuery(Globals.Query);
                 Globals.oRec.MoveFirst();
@@ -1304,7 +1309,7 @@ namespace ServicioConectorFE.Framework
 
         public static void ActualizarEstadoFE(int ObjectType, int DocEntry, string MensajeError, string Estado, SAPbobsCOM.Company oCompanyDAO)
         {
-            string nombre_Store = "SMC_ActualizarEstadoFE";
+            string nombre_Store = "EXX_ActualizarEstadoFE";
             SAPbobsCOM.Recordset oRecFE = default(SAPbobsCOM.Recordset);
             string Query = "";
             try

@@ -9,9 +9,6 @@ namespace ServicioConectorFE
 {
     static class Program
     {
-        /// <summary>
-        /// Punto de entrada principal para la aplicación.
-        /// </summary>
         static void Main()
         {
             if (Environment.UserInteractive)

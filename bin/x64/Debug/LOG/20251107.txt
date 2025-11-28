@@ -1,0 +1,35 @@
+Z_PRUEBAS_D 10:49:37-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 10:50:16-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 10:52:35-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:00:12-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:01:16-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:02:31-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:06:29-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:11:59-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:12:23-(: )-FACTURA-F001-2: Invalid field name
+Z_PRUEBAS_D 11:14:36-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:18:10-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:18:50-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:19:46-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:20:23-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:35:29-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:40:15-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:46:14-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:50:17-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:55:40-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 11:59:11-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 12:05:02-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 12:06:47-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 12:07:48-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 12:10:00-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 12:10:22-(: )-FACTURA-F001-2: Documento ha sido enviado con éxito
+Z_PRUEBAS_D 12:14:22-(: )-FACTURA-F001-2: Documento ha sido enviado con éxito
+Z_PRUEBAS_D 12:17:21-(: )-FACTURA-F001-3: Documento ha sido enviado con éxito
+Z_PRUEBAS_D 12:30:52-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 12:32:17-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 12:33:18-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 12:34:59-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 12:40:06-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 12:44:35-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 13:21:01-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP
+Z_PRUEBAS_D 13:21:50-(: )-Servicio conectado a la base Z_PRUEBAS_D de SAP

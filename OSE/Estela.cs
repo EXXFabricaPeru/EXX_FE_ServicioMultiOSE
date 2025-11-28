@@ -20,7 +20,7 @@ namespace ServicioConectorFE.OSE
         {
             bool result = false;
 
-            Entities.Estela.DocumentoRetencionFE oDocumentoRetFE = new Entities.Estela.DocumentoRetencionFE();
+            Entities.Estela.Retencion oDocumentoRetFE = new Entities.Estela.Retencion();
 
             try
             {
@@ -131,7 +131,7 @@ namespace ServicioConectorFE.OSE
             }
             catch (Exception ex)
             {
-                SAPDI.ActualizarEstadoFE(objectype, docentry, ex.Message, "", Globals.oCompany);
+                mensaje_error = ex.Message;
                 return false;
             }
             return result;
@@ -841,26 +841,7 @@ namespace ServicioConectorFE.OSE
         public static bool RegistrarGuia(string docmun, int objectype, string tipodocumento, string Tabla, int docentry, ref string EstadoDocumento, ref string Folio, ref string mensaje_error)
         {
             bool result = false;
-            Entities.Estela.Documento oBeFEDOC = new Entities.Estela.Documento();
-            System.Data.DataTable dtDetalles = new System.Data.DataTable();
 
-            try
-            {
-                DateTime date1 = DateTime.Now;
-
-                oBeFEDOC.DocEntry = docentry.ToString();
-                SAPDI.ObtenerDatosCPEEstela(ref oBeFEDOC, Tabla);
-                oBeFEDOC.Detalles = new List<Entities.Estela.DocLine>();
-                SAPDI.ObtenerDetalleDocumento(ref dtDetalles, Tabla, docentry);
-
-                String Cadena = string.Empty;
-
-            }
-            catch (Exception ex)
-            {
-                //SAPDI.ActualizarEstadoFE(objectype, docentry, ex.Message, "", Globals.oCompany);
-                return false;
-            }
             return result;
         }
 
@@ -999,7 +980,7 @@ namespace ServicioConectorFE.OSE
                             bool respuestaanexo = false;
 
                             #region CONSULTAR COMPROBANTE ESTELA
-                            DocumentoRetencionFE oDocumentoRetFE1 = new DocumentoRetencionFE();
+                            Retencion oDocumentoRetFE1 = new Retencion();
                             SAPDI.ObtenerDatosCRE(document.DocEntry, ref oDocumentoRetFE1);
                             DateTime date1 = DateTime.Now;
 

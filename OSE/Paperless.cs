@@ -25,7 +25,7 @@ namespace ServicioConectorFE.OSE
         {
             bool result = false;
 
-            Entities.Estela.DocumentoRetencionFE oDocumentoRetFE = new Entities.Estela.DocumentoRetencionFE();
+            Entities.Estela.Retencion oDocumentoRetFE = new Entities.Estela.Retencion();
 
             try
             {

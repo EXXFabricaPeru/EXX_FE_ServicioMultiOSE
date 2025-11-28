@@ -155,8 +155,12 @@
     <Compile Include="Core\Main.cs" />
     <Compile Include="Core\Setup.cs" />
     <Compile Include="Core\Structure.cs" />
+    <Compile Include="Entities\Bizlinks\Guia.cs" />
     <Compile Include="Entities\Estela\Documento.cs" />
-    <Compile Include="Entities\Estela\DocumentoRetencionFE.cs" />
+    <Compile Include="Entities\Estela\Retencion.cs" />
+    <Compile Include="Entities\Nubefact\Documento.cs" />
+    <Compile Include="Entities\Nubefact\Retencion.cs" />
+    <Compile Include="Entities\Nubefact\Guia.cs" />
     <Compile Include="Entities\Paperless\Documento.cs" />
     <Compile Include="Entities\SAP\Baja.cs" />
     <Compile Include="Entities\SAP\Comprobante.cs" />
@@ -270,10 +274,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Entities\Bizlinks\" />
-    <Folder Include="Entities\Nubefact\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>

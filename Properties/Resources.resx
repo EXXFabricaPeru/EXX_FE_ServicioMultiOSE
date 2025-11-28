@@ -117,6 +117,68 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="EXX_ActualizarEstadoFE" xml:space="preserve">
+    <value>PROCEDURE "EXX_ActualizarEstadoFE" 
+(
+ IN DocEntry INT,
+ IN ObjectType varchar(5),
+ IN MensajeError CLOB,
+ IN Estado varchar(150)
+) 
+LANGUAGE SQLSCRIPT 
+AS 
+BEGIN
+ DECLARE EstadoFE VARCHAR(10);
+ 
+ SELECT 
+ (CASE 
+  WHEN Estado='AC_03' THEN '02'
+  WHEN Estado='RC_05' THEN '03'
+  WHEN Estado='PE_02' THEN '01'
+  WHEN Estado='01' THEN '01'
+  WHEN Estado='02' THEN '02'
+  WHEN Estado='03' THEN '03'
+  WHEN Estado='04' THEN '04'
+  ELSE '00'
+  END )into  EstadoFE
+ FROM dummy;
+ 
+ IF ObjectType='13' THEN
+  UPDATE "OINV" SET 
+  "U_EXX_MSJ_ESTADO_FE"=(CASE WHEN IFNULL(MensajeError, '')='' THEN "U_EXX_MSJ_ESTADO_FE" ELSE MensajeError END),
+  "U_EXX_ESTADO_FE"=EstadoFE
+  WHERE "DocEntry"=DocEntry;
+ ELSE 
+  IF ObjectType='14' THEN
+   UPDATE "ORIN" SET 
+   "U_EXX_MSJ_ESTADO_FE"=(CASE WHEN IFNULL(MensajeError, '')='' THEN "U_EXX_MSJ_ESTADO_FE" ELSE MensajeError END),
+   "U_EXX_ESTADO_FE"=EstadoFE
+   WHERE "DocEntry"=DocEntry;
+  ELSE 
+   IF ObjectType='15' THEN
+    UPDATE "ODLN" SET 
+    "U_EXX_MSJ_ESTADO_FE"=(CASE WHEN IFNULL(MensajeError, '')='' THEN "U_EXX_MSJ_ESTADO_FE" ELSE MensajeError END),
+    "U_EXX_ESTADO_FE"=EstadoFE
+    WHERE "DocEntry"=DocEntry;
+   ELSE
+    IF ObjectType='46'  THEN
+     UPDATE "OVPM" SET 
+     "U_EXX_MSJ_ESTADO_FE"=(CASE WHEN IFNULL(MensajeError, '')='' THEN "U_EXX_MSJ_ESTADO_FE" ELSE MensajeError END),
+     "U_EXX_ESTADO_FE"=EstadoFE
+     WHERE "DocEntry"=DocEntry;
+    ELSE
+     IF ObjectType='203'  THEN
+      UPDATE "ODPI" SET 
+      "U_EXX_MSJ_ESTADO_FE"=(CASE WHEN IFNULL(MensajeError, '')='' THEN "U_EXX_MSJ_ESTADO_FE" ELSE MensajeError END),
+      "U_EXX_ESTADO_FE"=EstadoFE
+      WHERE "DocEntry"=DocEntry;
+     END IF;
+    END IF;
+   END IF;
+  END IF;
+ END IF;
+END;</value>
+  </data>
   <data name="EXX_COMPROBANTES_ELECTRONICOS" xml:space="preserve">
     <value>PROCEDURE "EXX_COMPROBANTES_ELECTRONICOS"
 (
@@ -317,6 +379,176 @@ BEGIN
 END
 </value>
   </data>
+  <data name="EXX_RETENCION_DETALLE_FE" xml:space="preserve">
+    <value>CREATE PROCEDURE "EXX_RETENCION_DETALLE_FE"
+(
+ IN DocEntry INT -- Error string to be displayed
+)
+LANGUAGE SQLSCRIPT AS
+BEGIN
+ DECLARE FechaPago DATE;
+ DECLARE TipoCambio DECIMAL;
+ DECLARE TotalDocSinRet DECIMAL;
+ 
+ SELECT 
+ "TaxDate" into FechaPago
+ FROM "OVPM" T0 WHERE "DocEntry"=DocEntry;
+ 
+ select "Rate" into TipoCambio FROM "ORTT" WHERE "Currency"='USD' and "RateDate"=FechaPago;
+ 
+ IF EXISTS (SELECT 1 FROM "OVPM" T0 
+      INNER JOIN "VPM2" T1 ON T0."DocEntry" = T1."DocNum"
+      WHERE T0."DocEntry"= :DocEntry AND T1."WtAppld" + T1."WtAppldFC" = 0
+ ) THEN
+  SELECT (CASE WHEN T0."DocCurr"='SOL' THEN SUM(T1."WtAppld"+T1."BfDcntSum") ELSE SUM(T1."WtAppldFC"+T1."BfDcntSumF")END) into TotalDocSinRet FROM "OVPM" T0 
+  INNER JOIN "VPM2" T1 ON T0."DocEntry" = T1."DocNum"
+  WHERE T0."DocEntry"= :DocEntry AND T1."WtAppld" + T1."WtAppldFC" = 0
+  GROUP BY T0."DocCurr";
+ ELSE
+        TotalDocSinRet := 0;
+    END IF;
+    
+ SELECT 
+ 0 as numeroOrdenItem,
+ --ifnull(T4."FolioPref",'')
+ LPAD(ifnull(TO_VARCHAR(T4."FolioPref"),''),4,'0') ||'-'|| LPAD(ifnull(TO_VARCHAR(T4."FolioNum"),''),8,'0') as numeroDocumentoRelacionado, 
+
+ TO_VARCHAR(T4."TaxDate",'yyyy-MM-dd') as fechaEmisionDocumentoRelacionado,
+ '01' as tipoDocumentoRelacionado,
+ (CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal" ELSE T4."DocTotalFC" END) as importeTotalDocumentoRelacionado,
+ (CASE WHEN T4."DocCur"='SOL' THEN 'PEN' ELSE T4."DocCur" END)  as tipoMonedaDocumentoRelacionado,
+ --TO_VARCHAR(T4."TaxDate",'yyyy-MM-dd')  as fechaPago,
+ TO_VARCHAR(T0."TaxDate",'yyyy-MM-dd')  as fechaPago,
+ T1."InstId" as numeroPago,
+ 
+ (CASE WHEN IFNULL((T0."CreditSum"+ T0."CredSumFC"+T0."TrsfrSum"+T0."TrsfrSumFC"), 0) = 0
+    THEN (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' 
+        THEN (--PAGO DE FACTURA SIN RETENCION - 1 MEDIO DE PAGO EFECTIVO
+           CASE WHEN T0."DocCurr"='SOL' THEN ROUND(ROUND(T1."BfDcntSum"/((CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal" ELSE T4."DocTotalFC"*TipoCambio END) *0.03),2)*0.97* (CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal" ELSE T4."DocTotalFC"*TipoCambio END),2)
+                                    + ROUND((T1."WtAppld"+T1."BfDcntSum")/TotalDocSinRet * T0."CashSum", 2)
+           ELSE --PAGO DE FACTURA SIN RETENCION - CON 2 MEDIOS DE PAGO //PRORRATEO DEL MONTO EN EFECTIVO
+            ROUND(ROUND(T1."BfDcntSum"/((CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal"/TipoCambio ELSE T4."DocTotalFC" END)*0.03),2)*0.97*(CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal"/TipoCambio ELSE T4."DocTotalFC" END), 2)END)
+                              + ROUND((T1."WtAppldFC"+T1."BfDcntSumF")/TotalDocSinRet * T0."CashSumFC" * TipoCambio, 2)
+            ELSE (--PAGO DE FACTURA CON RETENCION
+              CASE WHEN T0."DocCurr"='SOL' THEN (T1."WtAppld"+T1."BfDcntSum") ELSE (T1."WtAppldFC"+T1."BfDcntSumF") END)END) 
+                 
+    ELSE (--PAGO DE FACTURA CON RETENCION
+      CASE WHEN T0."DocCurr"='SOL' THEN (T1."WtAppld"+T1."BfDcntSum") ELSE (T1."WtAppldFC"+T1."BfDcntSumF") END)
+ END) as importePagoSinRetencion, --PAGO TOTAL : MONTO PAGADO + RETENCION
+  
+ (CASE WHEN T0."DocCurr"='SOL' THEN 'PEN' ELSE T0."DocCurr" END) as monedaPago,
+ 
+ (CASE WHEN T0."DocCurr"='SOL' 
+    THEN (CASE WHEN T1."WtAppld" &gt; 0 THEN T1."WtAppld" 
+      ELSE (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' THEN ROUND((T1."WtAppld"+T1."BfDcntSum")/TotalDocSinRet * T0."CashSum", 2)
+        ELSE T1."WtAppld" END) END) 
+    ELSE (CASE WHEN T1."WtAppldFC" &gt; 0 THEN ROUND(T1."WtAppldFC" * TipoCambio, 2)
+      ELSE (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' THEN ROUND((T1."WtAppldFC"+T1."BfDcntSumF")/TotalDocSinRet * T0."CashSumFC" * TipoCambio, 2)
+        ELSE ROUND(T1."WtAppldFC" * TipoCambio) END) END) END) as importeRetenido,
+ 'PEN' as monedaImporteRetenido,
+ 
+ TO_VARCHAR(FechaPago,'yyyy-MM-dd') as fechaRetencion,
+ 
+ (CASE WHEN IFNULL((T0."CreditSum"+ T0."CredSumFC"+T0."TrsfrSum"+T0."TrsfrSumFC"), 0) = 0
+    THEN (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' 
+        THEN (CASE WHEN T0."DocCurr"='SOL' THEN ROUND(ROUND(T1."BfDcntSum"/((CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal" ELSE T4."DocTotalFC"*TipoCambio END) *0.03),2)*0.97* (CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal" ELSE T4."DocTotalFC"*TipoCambio END),2)
+           ELSE ROUND(ROUND(T1."BfDcntSum"/((CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal"/TipoCambio ELSE T4."DocTotalFC" END)*0.03),2)*0.97*(CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal"/TipoCambio ELSE T4."DocTotalFC" END), 2)END)
+            --ELSE (CASE WHEN T0."DocCurr"='SOL' THEN (T1."WtAppld"+T1."BfDcntSum") ELSE (T1."WtAppldFC"+T1."BfDcntSumF") END)END) 
+            ELSE (CASE WHEN T0."DocCurr"='SOL' THEN (T1."BfDcntSum") ELSE ROUND(T1."BfDcntSumF" * TipoCambio, 2) END)END) 
+    ELSE (CASE WHEN T0."DocCurr"='SOL' 
+      THEN (CASE WHEN T1."WtAppld" &gt; 0 THEN T1."BfDcntSum" 
+             ELSE (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' THEN ROUND(T1."BfDcntSum" - ((T1."WtAppld"+T1."BfDcntSum")/TotalDocSinRet * T0."CashSum"), 2)
+                ELSE T1."BfDcntSum" END) END)
+           ELSE (CASE WHEN T1."WtAppldFC" &gt; 0 THEN ROUND(T1."BfDcntSumF" * TipoCambio, 2)
+      ELSE (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' THEN ROUND(T1."BfDcntSumF" - ((T1."WtAppldFC"+T1."BfDcntSumF")/TotalDocSinRet * T0."CashSumFC") * TipoCambio, 2)
+        ELSE ROUND(T1."BfDcntSumF" * TipoCambio, 2) END) END) END)END) as importeTotalPagarNeto, -- MONTO PAGADO 
+ 
+ --(CASE WHEN T0."DocCurr"='SOL' THEN 'PEN' ELSE T0."DocCurr" END) as monedaMontoNetoPagado,
+ 'PEN' as monedaMontoNetoPagado,
+ (CASE WHEN T4."DocCur"='SOL' THEN 'PEN' ELSE T4."DocCur" END) as monedaReferenciaTipoCambio,
+ T0."SysRate" as tipoCambioPago,
+ 'PEN' as monedaObjetivoTasaCambio,
+ (CASE WHEN T4."DocCur"='SOL' THEN 1 ELSE TipoCambio END) as factorTipoCambioMoneda,
+ TO_VARCHAR(FechaPago,'yyyy-MM-dd') as fechaCambio
+ FROM "OVPM" T0 
+ inner join "VPM2" T1 ON T0."DocEntry"=T1."DocNum"
+ INNER JOIN "OCRD" T2 ON T0."CardCode"=T2."CardCode"
+ LEFT JOIN "OBPL" T3 ON T0."BPLId"=T3."BPLId"
+ INNER JOIN "OPCH" T4 ON T4."DocEntry"=T1."DocEntry" AND T1."InvType"='18'
+ LEFT JOIN "OACT" T5 ON T0."CashAcct" = T5."AcctCode"
+ WHERE T0."DocEntry"=DocEntry;
+END;</value>
+  </data>
+  <data name="EXX_RETENCION_FE" xml:space="preserve">
+    <value>CREATE PROCEDURE "EXX_RETENCION_FE"
+(
+ IN DocEntry INT -- Error string to be displayed
+)
+LANGUAGE SQLSCRIPT AS
+BEGIN
+
+ SELECT 
+ IFNULL(T3."GlblLocNum", T4."TaxIdNum") as idEmisor,
+ 20 as tipoDocumento,
+ T0."U_EXX_SERIE_FE" as Serie,
+ T0."U_EXX_NUM_FE"  as Correlativo,
+ IFNULL(T3."GlblLocNum", T4."E_Mail") as correoEmisor,
+ IFNULL(T2."E_Mail", '') as correoAdquiriente,
+ 
+ 
+ IFNULL(T0."U_EXX_SERIE_FE",'')||'-'|| LPAD(ifnull(TO_VARCHAR(T0."U_EXX_NUM_FE"),''),8,'0') as serieNumeroRetencion, 
+ TO_VARCHAR(T0."TaxDate",'yyyy-MM-dd') as fechaEmision,
+ 20 as tipoDocumento,
+ 
+ --EMISOR
+ IFNULL(T3."GlblLocNum", T4."TaxIdNum") as numeroDocumentoEmisor,
+ '6' as tipoDocumentoEmisor,
+ IFNULL(T3."BPLName", T4."CompnyName") as nombreComercialEmisor,
+ IFNULL(T3."BPLName", T4."CompnyName") as razonSocialEmisor,
+ IFNULL(T3."AddrType"||' '||T3."Street" ||' '||T3."StreetNo"||' '||T3."Building", T4."CompnyAddr")   as direccionEmisor,
+ '' as urbanizacionEmisor,
+ IFNULL(T3."ZipCode", T5."ZipCode") as ubigeoEmisor,
+ IFNULL(T3."City", (SELECT "Name" FROM OCST A WHERE A."Code" = T4."State" AND A."Country" = T4."Country")) as departamentoEmisor, --MODIFICAR
+ IFNULL(T3."County", T5."County") as provinciaEmisor,
+  IFNULL(T3."City", T5."City")as distritoEmisor,
+ IFNULL(T3."Country", T5."Country") as codigoPaisEmisor,
+ '0000' as codigoLocalAnexoEmisor,
+ '' as numeroAutorizacionRem,
+ '' as codigoAutorizadoRem,
+ --END EMISOR
+ 
+ --PROVEEDOR
+ T2."LicTradNum" as numeroDocumentoProveedor,
+ T2."U_EXX_TIPODOCU"  as tipoDocumentoProveedor,
+ T2."CardName" as razonSocialProveedor,
+ T2."CardName" as nombreComercialProveedor,
+ IFNULL((SELECT MAX(T00."GlblLocNum") FROM "CRD1" T00 WHERE T00."CardCode"=T2."CardCode" AND T00."AdresType"='B'),'') as ubigeoProveedor,
+ IFNULL((SELECT MAX(T00."Street") FROM "CRD1" T00 WHERE T00."CardCode"=T2."CardCode" AND T00."AdresType"='B'),'') as direccionProveedor,
+ --'' as direccionProveedor,
+ '' as urbanizacionProveedor,
+ IFNULL((SELECT MAX(T00."County") FROM "CRD1" T00 WHERE T00."CardCode"=T2."CardCode" AND T00."AdresType"='B'),'') as provinciaProveedor,
+ IFNULL((SELECT MAX(T00."County") FROM "CRD1" T00 WHERE T00."CardCode"=T2."CardCode" AND T00."AdresType"='B'),'') as departamentoProveedor,
+ IFNULL(T3."City", (SELECT "Name" FROM OCST A WHERE A."Code" = IFNULL((SELECT MAX(T00."State") FROM "CRD1" T00 WHERE T00."CardCode"=T2."CardCode" AND T00."AdresType"='B'),'') AND A."Country" = 'PE')) as departamentoProveedor,
+ IFNULL((SELECT MAX(T00."ZipCode") FROM "CRD1" T00 WHERE T00."CardCode"=T2."CardCode" AND T00."AdresType"='B'),'') as distritoProveedor,
+ IFNULL((SELECT MAX(T00."Country") FROM "CRD1" T00 WHERE T00."CardCode"=T2."CardCode" AND T00."AdresType"='B'),'') as codigoPaisProveedor,
+ --END PROVEEDOR
+ 
+ --DATOS DE RETENCION
+ '01' as regimenRetencion,
+ '3.00' as tasaRetencion,
+ '' as observaciones,
+ 0 as importeTotalRetenido,
+ 'PEN' as tipoMonedaTotalRetenido,
+ 0 as importeTotalPagado,
+ 'PEN' as tipoMonedaTotalPagado
+ --END DATOS DE RETENCION 
+ 
+ FROM "OADM" T4, "ADM1" T5, "OVPM" T0
+ INNER JOIN "OCRD" T2 ON T0."CardCode"=T2."CardCode"
+ LEFT JOIN "OBPL" T3 ON T0."BPLId"=T3."BPLId"
+ WHERE T0."DocEntry"=DocEntry;
+END;</value>
+  </data>
   <data name="ObtenerADM1" xml:space="preserve">
     <value>SELECT 
 "ZipCode",
@@ -389,9 +621,11 @@ T1."CardName" AS "nombre",
 T1."Country" AS "codigoPais",
 IFNULL(T1."Phone1", '') as "telefono",
 IFNULL(T1."Fax", '') as "fax",
+T1."GlblLocNum",
 (SELECT TOP 1 IFNULL(T2."Street",'') || ' - ' || IFNULL(T2."County", '') FROM CRD1 T2  WHERE T2."AdresType" = 'S' AND T2."CardCode" = '{0}' AND T2."Address" = '{2}') AS "obra"
 FROM OCRD T1
-WHERE T1."CardCode" = '{0}'</value>
+WHERE T1."CardCode" = '{0}'
+</value>
   </data>
   <data name="ObtenerDatosCPE" xml:space="preserve">
     <value>SELECT 
@@ -405,11 +639,11 @@ WHERE T1."CardCode" = '{0}'</value>
  "FolioPref" as "serie",
  "FolioNum" as "correlativo",
  --Datos de referencia-----------------------------------------------------------------------------
- (CASE "Indicator" WHEN '07' THEN "U_SMC_TIPONC_FE"
-    WHEN '08' THEN "U_SMC_TIPOND_FE"
+ (CASE "Indicator" WHEN '07' THEN "U_EXX_TIPONC_FE"
+    WHEN '08' THEN "U_EXX_TIPOND_FE"
      ELSE '' END) as "notaTipo",
-   (CASE "Indicator" WHEN '07' THEN "U_SMC_MOTNC_FE"
-    WHEN '08' THEN "U_SMC_MOTND_FE" 
+   (CASE "Indicator" WHEN '07' THEN "U_EXX_MOTNT_FE"
+    WHEN '08' THEN "U_EXX_MOTNT_FE" 
     ELSE '' END) as "notaSustento",
  IFNULL("U_EXX_TIPDOCOR", '') as "tipoDocumentoRef",
  IFNULL("U_EXX_SERDOCOR", '') as "serieRef",
@@ -419,11 +653,11 @@ WHERE T1."CardCode" = '{0}'</value>
  TO_NVARCHAR("DocDate", 'yyyy-MM-dd') as "fechaEmision",
  "DocCur" as "tipoMoneda",
  "DocRate" as "TipoCambio",
-(CASE WHEN IFNULL("U_SMC_TIPOOPERACION_FE", '') = '' 
+(CASE WHEN IFNULL("U_EXX_TIPOOPERACION_FE", '') = '' 
      THEN (CASE WHEN "U_EXX_TIPEXP" = '00' THEN (CASE WHEN (SELECT count(*) FROM "INV6" WHERE "DocEntry"=T0."DocEntry" AND UPPER("U_EXX_CONFTIPODET")='SI')&gt;0 THEN '1001' ELSE '0101' END) 
           ELSE '0200' END)
-       ELSE "U_SMC_TIPOOPERACION_FE" END) AS "tipoOperacion",
- IFNULL("U_SMC_ORDENCOMPRA_FE", '') as "ordenCompra",
+       ELSE "U_EXX_TIPOOPERACION_FE" END) AS "tipoOperacion",
+ IFNULL("U_EXX_ORDENCOMPRA_FE", '') as "ordenCompra",
  TO_DECIMAL((CASE "DocCur" WHEN 'SOL' THEN "RoundDif" 
                  WHEN 'PEN' THEN "RoundDif" 
                ELSE "RoundDifFC" END), 15,2) AS "redondeo",
@@ -480,10 +714,8 @@ WHERE "DocEntry" = {1}</value>
  (CASE T0."DocCur" WHEN 'SOL' THEN T1."VatSum" WHEN 'PEN' THEN T1."VatSum" ELSE T1."VatSumFrgn" END) AS "montoIGV", 
  T1."DiscPrcnt",
  T1."TaxOnly",
- T1."U_SMC_TIPOAFECT_FE",
- (SELECT "OcrName" FROM OOCR WHERE "OcrCode" = T1."OcrCode2") AS "Operacion",
- (SELECT "Name" FROM "@EXT_CONDCARGA" WHERE "Code" = T1."U_EXT_CONDCARGA") AS "CondicionCarga",
- (SELECT "Name" FROM "@EXT_TAMCONTENEDOR" WHERE "Code" = T1."U_EXT_TAMCONTENEDOR") AS "Tamaño"
+ T1."U_EXX_TIPOAFECT_FE",
+ (SELECT "OcrName" FROM OOCR WHERE "OcrCode" = T1."OcrCode2") AS "Operacion"
 FROM "{0}" T0
 INNER JOIN "{1}1" T1 ON T0."DocEntry" = T1."DocEntry"
 INNER JOIN "OITM" T2 ON T1."ItemCode" = T2."ItemCode"
@@ -492,8 +724,136 @@ WHERE T0."DocEntry" = {2}
 --T1."Rate", T1."Price", T1."PriceAfVAT", T1. "DiscPrcnt", T1."TaxOnly",T1."U_SMC_TIPOAFECT_FE", T1."LineNum",T2."U_EXX_TIPOUMED"
 ORDER BY T1."LineNum"</value>
   </data>
+  <data name="ObtenerDetalleEstela" xml:space="preserve">
+    <value>SELECT 
+ T0."DocCur",
+ T1."ItemCode" as "codigoArt",
+ T1."AcctCode" as "descripcionServ",
+ T1."Dscription" as "descripcion",
+ T1."Quantity" AS "cantidadUnidades",
+ (CASE WHEN IFNULL(T1."unitMsr", '') = '' THEN 'UND' ELSE T1."unitMsr" END) as "unidadMedidaSAP",
+ IFNULL(T2."U_EXX_TIPOUMED", 'NIU') as "unidadMedida",
+ T1."Price" AS "valorUnitario",
+ T1."PriceAfVAT" AS "precioUnitario",
+ (CASE T0."DocCur" WHEN 'SOL' THEN T1."LineTotal" WHEN 'PEN' THEN T1."LineTotal" ELSE T1."TotalFrgn" END) AS "valorItem",
+ T1."TaxCode" as "CodigoImpuesto",
+ T1."VatPrcnt" AS "tasaIGV",
+ T1."Rate",
+ T1."Price",
+ (CASE T0."DocCur" WHEN 'SOL' THEN T1."VatSum" WHEN 'PEN' THEN T1."VatSum" ELSE T1."VatSumFrgn" END) AS "montoIGV", 
+ T1."DiscPrcnt",
+ T1."TaxOnly",
+ T1."U_SMC_TIPOAFECT_FE",
+ (SELECT "OcrName" FROM OOCR WHERE "OcrCode" = T1."OcrCode2") AS "Operacion",
+ (SELECT "Name" FROM "@EXT_CONDCARGA" WHERE "Code" = T1."U_EXT_CONDCARGA") AS "CondicionCarga",
+ (SELECT "Name" FROM "@EXT_TAMCONTENEDOR" WHERE "Code" = T1."U_EXT_TAMCONTENEDOR") AS "Tamaño"
+FROM "OINV" T0
+INNER JOIN "INV1" T1 ON T0."DocEntry" = T1."DocEntry"
+INNER JOIN "OITM" T2 ON T1."ItemCode" = T2."ItemCode"
+WHERE T0."DocEntry" = {0}
+ORDER BY T1."LineNum"</value>
+  </data>
   <data name="ObtenerMonedas" xml:space="preserve">
     <value>SELECT "CurrCode", "CurrName", "ISOCurrCod" FROM OCRN
 </value>
+  </data>
+  <data name="SMC_RETENCION_DETALLE_FE" xml:space="preserve">
+    <value>ALTER PROCEDURE "SMC_RETENCION_DETALLE_FE"
+(
+ IN DocEntry INT -- Error string to be displayed
+)
+LANGUAGE SQLSCRIPT AS
+BEGIN
+ DECLARE FechaPago DATE;
+ DECLARE TipoCambio DECIMAL;
+ DECLARE TotalDocSinRet DECIMAL;
+ 
+ SELECT 
+ "TaxDate" into FechaPago
+ FROM "OVPM" T0 WHERE "DocEntry"=DocEntry;
+ 
+ select "Rate" into TipoCambio FROM "ORTT" WHERE "Currency"='USD' and "RateDate"=FechaPago;
+ 
+ IF EXISTS (SELECT 1 FROM "OVPM" T0 
+      INNER JOIN "VPM2" T1 ON T0."DocEntry" = T1."DocNum"
+      WHERE T0."DocEntry"= :DocEntry AND T1."WtAppld" + T1."WtAppldFC" = 0
+ ) THEN
+  SELECT (CASE WHEN T0."DocCurr"='SOL' THEN SUM(T1."WtAppld"+T1."BfDcntSum") ELSE SUM(T1."WtAppldFC"+T1."BfDcntSumF")END) into TotalDocSinRet FROM "OVPM" T0 
+  INNER JOIN "VPM2" T1 ON T0."DocEntry" = T1."DocNum"
+  WHERE T0."DocEntry"= :DocEntry AND T1."WtAppld" + T1."WtAppldFC" = 0
+  GROUP BY T0."DocCurr";
+ ELSE
+        TotalDocSinRet := 0;
+    END IF;
+    
+ SELECT 
+ 0 as numeroOrdenItem,
+ --ifnull(T4."FolioPref",'')
+ LPAD(ifnull(TO_VARCHAR(T4."FolioPref"),''),4,'0') ||'-'|| LPAD(ifnull(TO_VARCHAR(T4."FolioNum"),''),8,'0') as numeroDocumentoRelacionado, 
+
+ TO_VARCHAR(T4."TaxDate",'yyyy-MM-dd') as fechaEmisionDocumentoRelacionado,
+ '01' as tipoDocumentoRelacionado,
+ (CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal" ELSE T4."DocTotalFC" END) as importeTotalDocumentoRelacionado,
+ (CASE WHEN T4."DocCur"='SOL' THEN 'PEN' ELSE T4."DocCur" END)  as tipoMonedaDocumentoRelacionado,
+ --TO_VARCHAR(T4."TaxDate",'yyyy-MM-dd')  as fechaPago,
+ TO_VARCHAR(T0."TaxDate",'yyyy-MM-dd')  as fechaPago,
+ T1."InstId" as numeroPago,
+ 
+ (CASE WHEN IFNULL((T0."CreditSum"+ T0."CredSumFC"+T0."TrsfrSum"+T0."TrsfrSumFC"), 0) = 0
+    THEN (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' 
+        THEN (--PAGO DE FACTURA SIN RETENCION - 1 MEDIO DE PAGO EFECTIVO
+           CASE WHEN T0."DocCurr"='SOL' THEN ROUND(ROUND(T1."BfDcntSum"/((CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal" ELSE T4."DocTotalFC"*TipoCambio END) *0.03),2)*0.97* (CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal" ELSE T4."DocTotalFC"*TipoCambio END),2)
+                                    + ROUND((T1."WtAppld"+T1."BfDcntSum")/TotalDocSinRet * T0."CashSum", 2)
+           ELSE --PAGO DE FACTURA SIN RETENCION - CON 2 MEDIOS DE PAGO //PRORRATEO DEL MONTO EN EFECTIVO
+            ROUND(ROUND(T1."BfDcntSum"/((CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal"/TipoCambio ELSE T4."DocTotalFC" END)*0.03),2)*0.97*(CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal"/TipoCambio ELSE T4."DocTotalFC" END), 2)END)
+                              + ROUND((T1."WtAppldFC"+T1."BfDcntSumF")/TotalDocSinRet * T0."CashSumFC" * TipoCambio, 2)
+            ELSE (--PAGO DE FACTURA CON RETENCION
+              CASE WHEN T0."DocCurr"='SOL' THEN (T1."WtAppld"+T1."BfDcntSum") ELSE (T1."WtAppldFC"+T1."BfDcntSumF") END)END) 
+                 
+    ELSE (--PAGO DE FACTURA CON RETENCION
+      CASE WHEN T0."DocCurr"='SOL' THEN (T1."WtAppld"+T1."BfDcntSum") ELSE (T1."WtAppldFC"+T1."BfDcntSumF") END)
+ END) as importePagoSinRetencion, --PAGO TOTAL : MONTO PAGADO + RETENCION
+  
+ (CASE WHEN T0."DocCurr"='SOL' THEN 'PEN' ELSE T0."DocCurr" END) as monedaPago,
+ 
+ (CASE WHEN T0."DocCurr"='SOL' 
+    THEN (CASE WHEN T1."WtAppld" &gt; 0 THEN T1."WtAppld" 
+      ELSE (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' THEN ROUND((T1."WtAppld"+T1."BfDcntSum")/TotalDocSinRet * T0."CashSum", 2)
+        ELSE T1."WtAppld" END) END) 
+    ELSE (CASE WHEN T1."WtAppldFC" &gt; 0 THEN ROUND(T1."WtAppldFC" * TipoCambio, 2)
+      ELSE (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' THEN ROUND((T1."WtAppldFC"+T1."BfDcntSumF")/TotalDocSinRet * T0."CashSumFC" * TipoCambio, 2)
+        ELSE ROUND(T1."WtAppldFC" * TipoCambio) END) END) END) as importeRetenido,
+ 'PEN' as monedaImporteRetenido,
+ 
+ TO_VARCHAR(FechaPago,'yyyy-MM-dd') as fechaRetencion,
+ 
+ (CASE WHEN IFNULL((T0."CreditSum"+ T0."CredSumFC"+T0."TrsfrSum"+T0."TrsfrSumFC"), 0) = 0
+    THEN (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' 
+        THEN (CASE WHEN T0."DocCurr"='SOL' THEN ROUND(ROUND(T1."BfDcntSum"/((CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal" ELSE T4."DocTotalFC"*TipoCambio END) *0.03),2)*0.97* (CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal" ELSE T4."DocTotalFC"*TipoCambio END),2)
+           ELSE ROUND(ROUND(T1."BfDcntSum"/((CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal"/TipoCambio ELSE T4."DocTotalFC" END)*0.03),2)*0.97*(CASE WHEN T4."DocCur"='SOL' THEN T4."DocTotal"/TipoCambio ELSE T4."DocTotalFC" END), 2)END)
+            --ELSE (CASE WHEN T0."DocCurr"='SOL' THEN (T1."WtAppld"+T1."BfDcntSum") ELSE (T1."WtAppldFC"+T1."BfDcntSumF") END)END) 
+            ELSE (CASE WHEN T0."DocCurr"='SOL' THEN (T1."BfDcntSum") ELSE ROUND(T1."BfDcntSumF" * TipoCambio, 2) END)END) 
+    ELSE (CASE WHEN T0."DocCurr"='SOL' 
+      THEN (CASE WHEN T1."WtAppld" &gt; 0 THEN T1."BfDcntSum" 
+             ELSE (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' THEN ROUND(T1."BfDcntSum" - ((T1."WtAppld"+T1."BfDcntSum")/TotalDocSinRet * T0."CashSum"), 2)
+                ELSE T1."BfDcntSum" END) END)
+           ELSE (CASE WHEN T1."WtAppldFC" &gt; 0 THEN ROUND(T1."BfDcntSumF" * TipoCambio, 2)
+      ELSE (CASE WHEN IFNULL(T5."FormatCode", '') LIKE '40%' THEN ROUND(T1."BfDcntSumF" - ((T1."WtAppldFC"+T1."BfDcntSumF")/TotalDocSinRet * T0."CashSumFC") * TipoCambio, 2)
+        ELSE ROUND(T1."BfDcntSumF" * TipoCambio, 2) END) END) END)END) as importeTotalPagarNeto, -- MONTO PAGADO 
+ 
+ --(CASE WHEN T0."DocCurr"='SOL' THEN 'PEN' ELSE T0."DocCurr" END) as monedaMontoNetoPagado,
+ 'PEN' as monedaMontoNetoPagado,
+ (CASE WHEN T4."DocCur"='SOL' THEN 'PEN' ELSE T4."DocCur" END) as monedaReferenciaTipoCambio,
+ 'PEN' as monedaObjetivoTasaCambio,
+ (CASE WHEN T4."DocCur"='SOL' THEN 1 ELSE TipoCambio END) as factorTipoCambioMoneda,
+ TO_VARCHAR(FechaPago,'yyyy-MM-dd') as fechaCambio
+ FROM "OVPM" T0 
+ inner join "VPM2" T1 ON T0."DocEntry"=T1."DocNum"
+ INNER JOIN "OCRD" T2 ON T0."CardCode"=T2."CardCode"
+ LEFT JOIN "OBPL" T3 ON T0."BPLId"=T3."BPLId"
+ INNER JOIN "OPCH" T4 ON T4."DocEntry"=T1."DocEntry" AND T1."InvType"='18'
+ LEFT JOIN "OACT" T5 ON T0."CashAcct" = T5."AcctCode"
+ WHERE T0."DocEntry"=DocEntry;
+END;</value>
   </data>
 </root>

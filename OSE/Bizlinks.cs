@@ -22,7 +22,7 @@ namespace ServicioConectorFE.OSE
         {
             bool result = false;
 
-            Entities.Estela.DocumentoRetencionFE oDocumentoRetFE = new Entities.Estela.DocumentoRetencionFE();
+            Entities.Estela.Retencion oDocumentoRetFE = new Entities.Estela.Retencion();
 
             try
             {
@@ -928,7 +928,7 @@ namespace ServicioConectorFE.OSE
                             bool respuestaanexo = false;
 
                             #region CONSULTAR COMPROBANTE ESTELA
-                            DocumentoRetencionFE oDocumentoRetFE1 = new DocumentoRetencionFE();
+                            Retencion oDocumentoRetFE1 = new Retencion();
                             SAPDI.ObtenerDatosCRE(document.DocEntry, ref oDocumentoRetFE1);
                             DateTime date1 = DateTime.Now;
 

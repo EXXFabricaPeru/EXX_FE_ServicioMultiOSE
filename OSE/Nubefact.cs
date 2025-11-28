@@ -1,9 +1,19 @@
-﻿using ServicioConectorFE.Core;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using ServicioConectorFE.Core;
+using ServicioConectorFE.Entities.Nubefact;
+using ServicioConectorFE.Entities.SAP;
 using ServicioConectorFE.Framework;
+using ServicioConectorFE.IntegradorEstelaAdjunto;
+using ServicioConectorFE.IntegradorEstelaBaja;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.ServiceModel;
+using System.ServiceModel.Security.Tokens;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,10 +21,171 @@ namespace ServicioConectorFE.OSE
 {
     public class Nubefact
     {
+        public static bool RegistrarRetencion(string docmun, int objectype, string tipodocumento, string Tabla, int docentry, ref string EstadoDocumento, ref string Folio, ref string mensaje_error)
+        {
+            bool result = false;
+
+            Entities.Estela.Retencion oDocumentoRetFE = new Entities.Estela.Retencion();
+            Entities.Nubefact.Retencion oRet = new Entities.Nubefact.Retencion();
+
+            try
+            {
+                DateTime date1 = DateTime.Now;
+                SAPDI.ObtenerDatosCRE(docentry, ref oDocumentoRetFE);
+
+                Globals.ValidaCamposCRE(oDocumentoRetFE);
+
+                oRet.Operacion = "generar_retencion";
+                oRet.Serie = "RRR1"; //oDocumentoRetFE.serieNumeroRetencion.Split('-').ToList()[0];
+                oRet.Numero = Convert.ToInt32(oDocumentoRetFE.serieNumeroRetencion.Split('-').ToList()[1]);
+                oRet.FechaDeEmision = Convert.ToDateTime(oDocumentoRetFE.fechaEmision).ToString("dd-MM-yyyy");
+                oRet.ClienteTipoDeDocumento = Convert.ToInt32(oDocumentoRetFE.tipoDocumentoProveedor);
+                oRet.ClienteNumeroDeDocumento = oDocumentoRetFE.numeroDocumentoProveedor;
+                oRet.ClienteDenominacion = oDocumentoRetFE.razonSocialEmisor;
+                oRet.ClienteDireccion = oDocumentoRetFE.direccionEmisor.Replace('\r', ' ').Replace(Environment.NewLine, "");
+
+                var email = oDocumentoRetFE.correoAdquiriente.Split(';').ToList();
+                if (email.Count > 0)
+                {
+                    oRet.ClienteEmail = email[0].Trim();
+                    if (email.Count > 1) oRet.ClienteEmail = email[1].Trim();
+                    if (email.Count > 2) oRet.ClienteEmail = email[2].Trim();
+                }
+
+                if (oDocumentoRetFE.tipoMonedaTotalPagado == "SOL" || oDocumentoRetFE.tipoMonedaTotalPagado == "PEN")
+                {
+                    oRet.Moneda = "1";
+                    oRet.TipoDeTasaDeRetencion = Convert.ToDouble(oDocumentoRetFE.tasaRetencion) == 6 ? "2" : "1";
+                    oRet.TotalRetenido = oDocumentoRetFE.importeTotalRetenido;
+                    oRet.TotalPagado = oDocumentoRetFE.importeTotalPagado;
+                }
+                else
+                {
+                    oRet.Moneda = "1";
+                    oRet.TipoDeTasaDeRetencion = Convert.ToDouble(oDocumentoRetFE.tasaRetencion) == 6 ? "2" : "1";
+                    oRet.TotalRetenido = oDocumentoRetFE.importeTotalRetenido;
+                    oRet.TotalPagado = oDocumentoRetFE.importeTotalPagado;
+                }
+
+                oRet.Observaciones = oDocumentoRetFE.observaciones;
+                oRet.EnviarAutomaticamenteALaSunat = "true";
+                oRet.EnviarAutomaticamenteAlCliente = "false";
+                oRet.CodigoUnico = "";
+                oRet.FormatoDePdf = "A4";
+
+                // Inicializar la lista de items
+                oRet.Items = new List<RetencionItem>();
+
+                for (int i = 0; i < oDocumentoRetFE.RetencionItems.Count; i++)
+                {
+                    RetencionItem item = new RetencionItem();
+                    item.DocumentoRelacionadoTipo = oDocumentoRetFE.RetencionItems[i].tipoDocumentoRelacionado;
+                    item.DocumentoRelacionadoSerie = oDocumentoRetFE.RetencionItems[i].numeroDocumentoRelacionado.Split('-').ToList()[0];
+                    item.DocumentoRelacionadoNumero = Convert.ToInt32(oDocumentoRetFE.RetencionItems[i].numeroDocumentoRelacionado.Split('-').ToList()[1]);
+                    item.DocumentoRelacionadoFechaDeEmision = Convert.ToDateTime(oDocumentoRetFE.RetencionItems[i].fechaEmisionDocumentoRelacionado).ToString("dd-MM-yyyy");
+                    item.DocumentoRelacionadoMoneda = oDocumentoRetFE.RetencionItems[i].tipoMonedaDocumentoRelacionado == "SOL" || oDocumentoRetFE.RetencionItems[i].tipoMonedaDocumentoRelacionado == "PEN" ? "1" : "2";
+                    item.PagoFecha = Convert.ToDateTime(oDocumentoRetFE.RetencionItems[i].fechaPago).ToString("dd-MM-yyyy");
+                    item.PagoNumero = oDocumentoRetFE.RetencionItems[i].numeroPago;
+                    item.ImporteRetenidoFecha = Convert.ToDateTime(oDocumentoRetFE.RetencionItems[i].fechaEmisionDocumentoRelacionado).ToString("dd-MM-yyyy");
+
+                    if (item.DocumentoRelacionadoMoneda == "1")
+                    {
+                        item.DocumentoRelacionadoTotal = oDocumentoRetFE.RetencionItems[i].importeTotalDocumentoRelacionado;
+                        item.PagoTotalSinRetencion = oDocumentoRetFE.RetencionItems[i].importePagoSinRetencion;
+                        item.ImporteRetenido = oDocumentoRetFE.RetencionItems[i].importeRetenido;
+                        item.ImportePagadoConRetencion = Globals.SumarCadenas(oDocumentoRetFE.RetencionItems[i].importeTotalPagarNeto, oDocumentoRetFE.RetencionItems[i].importeRetenido);
+                    }
+                    else
+                    {
+                        item.TipoDeCambioFecha = Convert.ToDateTime(oDocumentoRetFE.RetencionItems[i].fechaCambio).ToString("dd-MM-yyyy");
+                        item.TipoDeCambio = oDocumentoRetFE.RetencionItems[i].factorTipoCambioMoneda;
+                        item.ImporteRetenido = Math.Round(Convert.ToDouble(oDocumentoRetFE.RetencionItems[i].importeRetenido) / Convert.ToDouble(item.TipoDeCambio), 2, MidpointRounding.AwayFromZero).ToString();
+                        item.DocumentoRelacionadoTotal = oDocumentoRetFE.RetencionItems[i].importeTotalDocumentoRelacionado;
+                        item.PagoTotalSinRetencion = Globals.SumarCadenas(oDocumentoRetFE.RetencionItems[i].importePagoSinRetencion, "-" + item.ImporteRetenido);
+                        item.ImportePagadoConRetencion = Math.Round(Convert.ToDouble(Globals.SumarCadenas(oDocumentoRetFE.RetencionItems[i].importeTotalPagarNeto, oDocumentoRetFE.RetencionItems[i].importeRetenido)) / Convert.ToDouble(item.TipoDeCambio), 2, MidpointRounding.AwayFromZero).ToString();
+                    }
+                    oRet.Items.Add(item);
+                }
+
+                try
+                {
+                    string json = JsonConvert.SerializeObject(oRet, Formatting.Indented);
+                    Console.WriteLine(json);
+                    byte[] bytes = Encoding.Default.GetBytes(json);
+                    string json_en_utf_8 = Encoding.UTF8.GetString(bytes);
+
+                    string json_de_respuesta = SendJson(Globals.URL_OSE, json_en_utf_8, Globals.TOKEN);
+                    dynamic r = JsonConvert.DeserializeObject<Respuesta>(json_de_respuesta);
+                    string r2 = JsonConvert.SerializeObject(r, Formatting.Indented);
+                    dynamic json_r_in = JsonConvert.DeserializeObject<Respuesta>(r2);
+
+                    dynamic leer_respuesta = JsonConvert.DeserializeObject<Respuesta>(json_de_respuesta);
+                    if (leer_respuesta.errors == null)
+                    {
+                        Folio = oDocumentoRetFE.serieNumeroRetencion;
+                        EstadoDocumento = "01";
+                        result = true;
+                    }
+                    else
+                    {
+                        if (leer_respuesta.errors != "Este documento ya existe en NubeFacT")
+                            throw new Exception(leer_respuesta.errors);
+                        else
+                        {
+                            Folio = oDocumentoRetFE.serieNumeroRetencion;
+                            EstadoDocumento = "01";
+                            result = true;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            catch (Exception ex)
+            {
+                mensaje_error = ex.Message;
+                return false;
+            }
+            finally
+            {
+                GC.Collect();
+            }
+            return result;
+        }
+
+        public static bool RegistrarGuia(string docmun, int objectype, string tipodocumento, string Tabla, int docentry, ref string EstadoDocumento, ref string Folio, ref string mensaje_error)
+        {
+            bool result = false;
+            Entities.Estela.Documento oBeFEDOC = new Entities.Estela.Documento();
+            System.Data.DataTable dtDetalles = new System.Data.DataTable();
+
+            try
+            {
+                DateTime date1 = DateTime.Now;
+
+                oBeFEDOC.DocEntry = docentry.ToString();
+                SAPDI.ObtenerDatosCPEEstela(ref oBeFEDOC, Tabla);
+                oBeFEDOC.Detalles = new List<Entities.Estela.DocLine>();
+                SAPDI.ObtenerDetalleDocumento(ref dtDetalles, Tabla, docentry);
+
+                String Cadena = string.Empty;
+
+            }
+            catch (Exception ex)
+            {
+                mensaje_error = ex.Message;
+                return false;
+            }
+            return result;
+        }
+
         public static bool RegistrarDocumento(string docmun, int objectype, string tipodocumento, string Tabla, int docentry, ref string EstadoDocumento, ref string Folio, ref string mensaje_error)
         {
             bool result = false;
             Entities.Estela.Documento oBeFEDOC = new Entities.Estela.Documento();
+            Entities.Nubefact.Documento oBeFE = new Entities.Nubefact.Documento();
             System.Data.DataTable dtDetalles = new System.Data.DataTable();
 
             try
@@ -83,11 +254,11 @@ namespace ServicioConectorFE.OSE
                         oDetalle.CodigoImpuesto = detalle.Field<string>("CodigoImpuesto").ToString();
                         oDetalle.tasaIGV = Convert.ToDouble(detalle.Field<string>("tasaIGV"));
                         oDetalle.Rate = Globals.RetirarMonedayDecimal(detalle.Field<string>("Rate").ToString());
-                        oDetalle.IgvTipo = detalle.Field<string>("U_SMC_TIPOAFECT_FE").ToString();
+                        oDetalle.IgvTipo = detalle.Field<string>("U_EXX_TIPOAFECT_FE").ToString();
                         oDetalle.descuentoPct = Globals.RetirarMonedayDecimal(detalle.Field<string>("DiscPrcnt"));
                         oDetalle.OperacionAfecta = oDetalle.CodigoImpuesto == "IGV" ? "A" : oDetalle.CodigoImpuesto == "INA" ? "I" : oDetalle.CodigoImpuesto == "EXO" ? "E" : ""; // detalle.Field<string>("U_BPP_OPER").ToString();
                         oDetalle.TaxOnly = detalle.Field<string>("TaxOnly").ToString();
-                        oDetalle.Glosa = detalle.Field<string>("U_EXA_GLOSA").ToString();
+                        //oDetalle.Glosa = detalle.Field<string>("U_EXA_GLOSA").ToString();
 
                         Double precioUnitario = 0;
                         Double Rate = Convert.ToDouble(oDetalle.Rate);
@@ -139,7 +310,7 @@ namespace ServicioConectorFE.OSE
                                 oDetalle.CodigoTributo = "9995";
                                 oDetalle.CodigoTributoInt = "FRE";
                                 oDetalle.NombreTributo = "EXP";
-                                oDetalle.IgvTipo = "40";
+                                oDetalle.IgvTipo = "4";
                                 MntExonerado += Convert.ToDouble(oDetalle.valorItem);
                             }
                             else
@@ -150,7 +321,7 @@ namespace ServicioConectorFE.OSE
                                     oDetalle.CodigoTributo = "9997";
                                     oDetalle.CodigoTributoInt = "VAT";
                                     oDetalle.NombreTributo = "EXO";
-                                    oDetalle.IgvTipo = "20";
+                                    oDetalle.IgvTipo = "2";
                                     MntExonerado += Convert.ToDouble(oDetalle.valorItem);
                                 }
                                 else if (oDetalle.OperacionAfecta == "I")
@@ -159,7 +330,7 @@ namespace ServicioConectorFE.OSE
                                     oDetalle.CodigoTributo = "9998";
                                     oDetalle.CodigoTributoInt = "FRE";
                                     oDetalle.NombreTributo = "INA";
-                                    oDetalle.IgvTipo = "30";
+                                    oDetalle.IgvTipo = "3";
                                     MntInafecto += Convert.ToDouble(oDetalle.valorItem);
                                 }
                                 else if (oDetalle.OperacionAfecta == "A")
@@ -168,7 +339,7 @@ namespace ServicioConectorFE.OSE
                                     oDetalle.CodigoTributo = "1000";
                                     oDetalle.CodigoTributoInt = "VAT";
                                     oDetalle.NombreTributo = "IGV";
-                                    oDetalle.IgvTipo = "10";
+                                    oDetalle.IgvTipo = "1";
                                     MntGrabado += Convert.ToDouble(oDetalle.valorItem);
                                     MntIGV += Convert.ToDouble(oDetalle.IgvMonto);
                                 }
@@ -217,11 +388,11 @@ namespace ServicioConectorFE.OSE
                         oDetalle.CodigoImpuesto = detalle.Field<string>("CodigoImpuesto").ToString();
                         oDetalle.tasaIGV = Convert.ToDouble(detalle.Field<string>("tasaIGV"));
                         oDetalle.Rate = Globals.RetirarMonedayDecimal(detalle.Field<string>("Rate").ToString());
-                        oDetalle.IgvTipo = detalle.Field<string>("U_SMC_TIPOAFECT_FE").ToString();
+                        oDetalle.IgvTipo = detalle.Field<string>("U_EXX_TIPOAFECT_FE").ToString();
                         oDetalle.descuentoPct = Globals.RetirarMonedayDecimal(detalle.Field<string>("DiscPrcnt"));
                         oDetalle.OperacionAfecta = oDetalle.CodigoImpuesto == "IGV" ? "A" : oDetalle.CodigoImpuesto == "INA" ? "I" : oDetalle.CodigoImpuesto == "EXO" ? "E" : ""; // detalle.Field<string>("U_BPP_OPER").ToString();
                         oDetalle.TaxOnly = detalle.Field<string>("TaxOnly").ToString();
-                        oDetalle.Glosa = detalle.Field<string>("U_EXA_GLOSA").ToString();
+                        //oDetalle.Glosa = detalle.Field<string>("U_EXA_GLOSA").ToString();
 
                         Double precioUnitario = 0;
                         Double Rate = Convert.ToDouble(oDetalle.Rate);
@@ -274,7 +445,7 @@ namespace ServicioConectorFE.OSE
                                 oDetalle.CodigoTributo = "9995";
                                 oDetalle.CodigoTributoInt = "FRE";
                                 oDetalle.NombreTributo = "EXP";
-                                oDetalle.IgvTipo = "40";
+                                oDetalle.IgvTipo = "4";
                                 MntExonerado += Convert.ToDouble(oDetalle.valorItem);
                             }
                             else
@@ -285,7 +456,7 @@ namespace ServicioConectorFE.OSE
                                     oDetalle.CodigoTributo = "9997";
                                     oDetalle.CodigoTributoInt = "VAT";
                                     oDetalle.NombreTributo = "EXO";
-                                    oDetalle.IgvTipo = "20";
+                                    oDetalle.IgvTipo = "2";
                                     MntExonerado += Convert.ToDouble(oDetalle.valorItem);
                                 }
                                 else if (oDetalle.OperacionAfecta == "I")
@@ -294,7 +465,7 @@ namespace ServicioConectorFE.OSE
                                     oDetalle.CodigoTributo = "9998";
                                     oDetalle.CodigoTributoInt = "FRE";
                                     oDetalle.NombreTributo = "INA";
-                                    oDetalle.IgvTipo = "30";
+                                    oDetalle.IgvTipo = "3";
                                     MntInafecto += Convert.ToDouble(oDetalle.valorItem);
                                 }
                                 else if (oDetalle.OperacionAfecta == "A")
@@ -303,7 +474,7 @@ namespace ServicioConectorFE.OSE
                                     oDetalle.CodigoTributo = "1000";
                                     oDetalle.CodigoTributoInt = "VAT";
                                     oDetalle.NombreTributo = "IGV";
-                                    oDetalle.IgvTipo = "10";
+                                    oDetalle.IgvTipo = "1";
                                     MntGrabado += Convert.ToDouble(oDetalle.valorItem);
                                     MntIGV += Convert.ToDouble(oDetalle.IgvMonto);
                                 }
@@ -355,11 +526,13 @@ namespace ServicioConectorFE.OSE
                         Globals.ObtenerAnticiposEstela(ref oBeFEDOC, Tabla, Convert.ToInt32(oBeFEDOC.DocEntry));
                 }
 
+                MntTotal = MntGrabado + MntInafecto + MntExonerado + MntIGV - Convert.ToDouble(Globals.SumarCadenas(oBeFEDOC.valorTotalAnticipos, oBeFEDOC.valorTotalIGVAnticipos));
+
                 oBeFEDOC.valorOperacionesGravadas = Globals.RetirarMonedayDecimal(MntGrabado.ToString());
                 oBeFEDOC.valorOperacionesExoneradas = Globals.RetirarMonedayDecimal(MntExonerado.ToString());
                 oBeFEDOC.valorOperacionesInafectas = Globals.RetirarMonedayDecimal(MntInafecto.ToString());
                 oBeFEDOC.valorOperacionesGratuitas = Globals.RetirarMonedayDecimal(MntTransGratuita.ToString());
-
+                oBeFEDOC.importeTotal = Globals.RetirarMonedayDecimal(MntTotal.ToString());
                 oBeFEDOC.otrosCargos = "0.00";
 
                 if (MntImpTransGrat > 0)
@@ -383,306 +556,162 @@ namespace ServicioConectorFE.OSE
                 //Gastos Adicionales
                 //Globals.ObtenerGastosAdicionales(ref oBeFEDOC, Convert.ToInt32(oBeFEDOC.DocEntry), Globals.SAPTable);
                 #endregion
-
                 oBeFEDOC.valorIgv = Convert.ToDouble(oBeFEDOC.valorIgv) < 0 ? "0.00" : oBeFEDOC.valorIgv;
 
-                //Encabezado
-                Cadena += "A;CODI_EMPR;;" + Globals.IdEmpresa + Environment.NewLine;
-                Cadena += "A;TipoDTE;;" + oBeFEDOC.tipoComprobante + Environment.NewLine;
-                Cadena += "A;Serie;;" + oBeFEDOC.serie + Environment.NewLine;
-                Cadena += "A;Correlativo;;" + oBeFEDOC.correlativo + Environment.NewLine;
-                Cadena += "A;FchEmis;;" + oBeFEDOC.fechaEmision + Environment.NewLine;
-                Cadena += "A;HoraEmision;;" + oBeFEDOC.horaEmision + Environment.NewLine;
-                Cadena += "A;TipoMoneda;;" + oBeFEDOC.tipoMoneda + Environment.NewLine;
 
-                //Datos del emisor
-                Cadena += "A;RUTEmis;;" + oBeFEDOC.emisor.ruc + Environment.NewLine;
-                Cadena += "A;TipoRucEmis;;" + oBeFEDOC.emisor.tipoIdentificacion + Environment.NewLine;
-                Cadena += "A;NomComer;;" + oBeFEDOC.emisor.nombreComercial + Environment.NewLine;
-                Cadena += "A;RznSocEmis;;" + oBeFEDOC.emisor.razonSocial + Environment.NewLine;
-                Cadena += "A;ComuEmis;;" + oBeFEDOC.emisor.ubigeo + Environment.NewLine;
-                Cadena += "A;DirEmis;;" + oBeFEDOC.emisor.direccion.Replace(Environment.NewLine, "") + Environment.NewLine;
-                Cadena += "A;ProviEmis;;" + oBeFEDOC.emisor.provincia + Environment.NewLine;
-                Cadena += "A;DeparEmis;;" + oBeFEDOC.emisor.departamento + Environment.NewLine;
-                Cadena += "A;DistriEmis;;" + oBeFEDOC.emisor.distrito + Environment.NewLine;
-                Cadena += "A;CodigoLocalAnexo;;0000" + Environment.NewLine;
+                //Armado de json nubefact
+                oBeFE.Operacion = "generar_comprobante";
+                oBeFE.TipoDeComprobante = oBeFEDOC.tipoComprobante == "01" ? "1" : oBeFEDOC.tipoComprobante == "03" ? "2" : oBeFEDOC.tipoComprobante == "07" ? "3" : "4";
+                oBeFE.Serie = "FFF1"; // oBeFEDOC.serie;
+                oBeFE.Numero = Convert.ToInt32(oBeFEDOC.correlativo);
+                oBeFE.SunatTransaction = 1;
+                oBeFE.ClienteTipoDeDocumento = Convert.ToInt32(oBeFEDOC.adquiriente.tipoIdentificacion);
+                oBeFE.ClienteNumeroDeDocumento = oBeFEDOC.adquiriente.numeroIdentificacion;
+                oBeFE.ClienteDenominacion = oBeFEDOC.adquiriente.nombre;
+                oBeFE.ClienteDireccion = oBeFEDOC.adquiriente.direccionFiscal;
+                var email = oBeFEDOC.adquiriente.email.Split(';').ToList();
+                if (email.Count > 0)
+                {
+                    oBeFE.ClienteEmail = email[0].Trim();
+                    if (email.Count > 1) oBeFE.ClienteEmail = email[1].Trim();
+                    if (email.Count > 2) oBeFE.ClienteEmail = email[2].Trim();
+                }
 
-                //Datos del receptor
-                Cadena += "A;TipoRutReceptor;;" + oBeFEDOC.adquiriente.tipoIdentificacion + Environment.NewLine;
-                Cadena += "A;RUTRecep;;" + oBeFEDOC.adquiriente.numeroIdentificacion + Environment.NewLine;
-                Cadena += "A;RznSocRecep;;" + oBeFEDOC.adquiriente.nombre + Environment.NewLine;
-                Cadena += "A;DirRecepUbiGeo;;" + oBeFEDOC.adquiriente.ubigeo + Environment.NewLine;
-                Cadena += "A;DirRecep;;" + oBeFEDOC.adquiriente.direccionFiscal.Replace(Environment.NewLine, "") + Environment.NewLine;
-                //Cadena += "A;DirRecepProvincia;;" + oBeFEDOC.adquiriente. + Environment.NewLine;
-                //Cadena += "A;DirRecepDepartamento;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                //Cadena += "A;DirRecepDistrito;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                //Cadena += "A;DirRecepCodPais;;" + oBeFEDOC.DocEntry + Environment.NewLine;
+                oBeFE.FechaDeEmision = DateTime.Now.ToString("dd-MM-yyyy"); //Convert.ToDateTime(oBeFEDOC.fechaEmision).ToString("dd-MM-yyyy");
+                oBeFE.FechaDeVencimiento = Convert.ToDateTime(oBeFEDOC.fechaVencimiento).ToString("dd-MM-yyyy");
+                oBeFE.Moneda = oBeFEDOC.tipoMoneda == "SOL" || oBeFEDOC.tipoMoneda == "PEN" ? "1" : "2";
+                if (oBeFE.Moneda == "1") oBeFE.TipoDeCambio = "";
+                else oBeFE.TipoDeCambio = oBeFEDOC.TipoCambio;
+                oBeFE.PorcentajeDeIgv = Convert.ToDouble(oBeFEDOC.tasaIgv) != 0 ? (Convert.ToDouble(oBeFEDOC.tasaIgv) * 100).ToString() : "0";
 
-                //Datos de NC
+                oBeFE.DescuentoGlobal = string.IsNullOrEmpty(oBeFEDOC.varlorDescuentoGlobal) ? "0" : oBeFEDOC.varlorDescuentoGlobal;
+                oBeFE.TotalDescuento = string.IsNullOrEmpty(oBeFEDOC.varlorDescuentoGlobal) ? "0" : oBeFEDOC.varlorDescuentoGlobal;
+                oBeFE.TotalAnticipo = string.IsNullOrEmpty(oBeFEDOC.valorTotalAnticipos) ? "0" : oBeFEDOC.valorTotalAnticipos;
+                oBeFE.TotalGravada = string.IsNullOrEmpty(oBeFEDOC.valorOperacionesGravadas) ? "0" : oBeFEDOC.valorOperacionesGravadas;
+                oBeFE.TotalInafecta = string.IsNullOrEmpty(oBeFEDOC.valorOperacionesInafectas) ? "0" : oBeFEDOC.valorOperacionesInafectas;
+                oBeFE.TotalExonerada = string.IsNullOrEmpty(oBeFEDOC.valorOperacionesExoneradas) ? "0" : oBeFEDOC.valorOperacionesExoneradas;
+                oBeFE.TotalIgv = string.IsNullOrEmpty(oBeFEDOC.valorIgv) ? "0" : oBeFEDOC.valorIgv;
+                oBeFE.TotalGratuita = string.IsNullOrEmpty(oBeFEDOC.valorOperacionesGratuitas) ? "0" : oBeFEDOC.valorOperacionesGratuitas;
+                oBeFE.TotalOtrosCargos = string.IsNullOrEmpty(oBeFEDOC.otrosCargos) ? "0" : oBeFEDOC.otrosCargos;
+                oBeFE.Total = string.IsNullOrEmpty(oBeFEDOC.importeTotal) ? "0" : oBeFEDOC.importeTotal;
+
+                oBeFE.PercepcionTipo = "";
+                oBeFE.PercepcionBaseImponible = "";
+                oBeFE.TotalPercepcion = "";
+                oBeFE.TotalIncluidoPercepcion = "";
+
+
+                if (!string.IsNullOrEmpty(oBeFEDOC.codigoDetraccion))
+                {
+                    oBeFE.Detraccion = "true";
+                    oBeFE.detracciontipo = oBeFEDOC.codigoDetraccion;
+                    oBeFE.detracciontotal = oBeFEDOC.totalDetraccion;
+                }
+                else
+                {
+                    oBeFE.Detraccion = "false";
+                    oBeFE.detracciontipo = "";
+                    oBeFE.detracciontotal = "";
+                }
+
+                oBeFE.Observaciones = oBeFEDOC.observaciones;
+
                 if (oBeFEDOC.tipoComprobante == "07" || oBeFEDOC.tipoComprobante == "08")
                 {
-                    Cadena += "A;CodigoAutorizacion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                    Cadena += "A;Sustento;;" + oBeFEDOC.notaSustento + Environment.NewLine;
-                    Cadena += "A;TipoNotaCredito;;" + oBeFEDOC.notaTipo + Environment.NewLine;
-                }
-
-                //Totales
-                Cadena += "A;MntNeto;;" + (MntGrabado + MntInafecto + MntExonerado) + Environment.NewLine;
-                Cadena += "A;MntExe;;" + MntInafecto + Environment.NewLine;
-                Cadena += "A;MntExo;;" + MntExonerado + Environment.NewLine;
-                Cadena += "A;MntTotalIgv;;" + MntIGV + Environment.NewLine;
-                Cadena += "A;MntTotGrat;;" + MntTransGratuita + Environment.NewLine;
-                //Cadena += "A;MntTotBoni;;" + MntTransGratuita + Environment.NewLine;
-                Cadena += "A;MntTotAnticipo;;" + oBeFEDOC.valorTotalAnticipos + Environment.NewLine;
-                Cadena += "A;MntTotal;;" + oBeFEDOC.importeTotal + Environment.NewLine;
-                Cadena += "A;TotDscNA ;;" + oBeFEDOC.valorDescuentoGlobal + Environment.NewLine;
-                Cadena += "A;TotCrgNA;;" + oBeFEDOC.otrosCargos + Environment.NewLine;
-                Cadena += "A;MntRedondeo;;" + oBeFEDOC.redondeo + Environment.NewLine;
-
-
-                //Leyendas
-                //Cadena += "A;1000;;" + Globals.MontoEnLetras(oBeFEDOC.importeTotal, Globals.ObtenerDescripcionMoneda(oBeFEDOC.tipoMoneda)) + Environment.NewLine;
-
-                //Retención
-                /*Cadena += "A;CodRetencion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                Cadena += "A;MntImpRetencion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                Cadena += "A;ObsRetencion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                Cadena += "A;MntRetencion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                Cadena += "A;MntTotalMenosRetencion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-
-                //Percepción
-                Cadena += "A;IndPercepcion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                Cadena += "A;CodPercepcion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                Cadena += "A;MntImpPercepcion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                Cadena += "A;ObsPercepcion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                Cadena += "A;MntPercepcion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                Cadena += "A;MntTotalMasPercepcion;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                Cadena += "A;IndEmiExcepcional;;" + oBeFEDOC.DocEntry + Environment.NewLine;*/
-
-                //Factura Guía
-
-
-                //Otros Conceptos Sunat
-                if (oBeFEDOC.tipoComprobante == "01" || oBeFEDOC.tipoComprobante == "03")
-                {
-                    Cadena += "A;TipoOperacion;;" + oBeFEDOC.tipoOperacion + Environment.NewLine;
-                    Cadena += "A;FechVencFact;;" + oBeFEDOC.fechaVencimiento + Environment.NewLine;
-                }
-           
-                //Impuestos/Retenciones Globales
-                if (Convert.ToDouble(oBeFEDOC.valorOperacionesGravadas) > 0)
-                {
-                    Cadena += "A2;CodigoImpuesto;;1000" + Environment.NewLine;
-                    Cadena += "A2;MontoImpuesto;;" + oBeFEDOC.Detalles.Sum(x => Convert.ToDouble(x.IgvMonto)) + Environment.NewLine;
-                    Cadena += "A2;TasaImpuesto;;" + oBeFEDOC.Detalles[0].tasaIGV + Environment.NewLine;
-                    Cadena += "A2;MontoImpuestoBase;;" + oBeFEDOC.valorOperacionesGravadas + Environment.NewLine;
-                }
-                if (Convert.ToDouble(oBeFEDOC.valorOperacionesInafectas) > 0)
-                {
-                    Cadena += "A2;CodigoImpuesto;;9998" + Environment.NewLine;
-                    Cadena += "A2;MontoImpuesto;;0.00" + Environment.NewLine;
-                    Cadena += "A2;TasaImpuesto;;0" + Environment.NewLine;
-                    Cadena += "A2;MontoImpuestoBase;;" + oBeFEDOC.valorOperacionesInafectas + Environment.NewLine;
-                }
-                if (Convert.ToDouble(oBeFEDOC.valorOperacionesExoneradas) > 0)
-                {
-                    Cadena += "A2;CodigoImpuesto;;9997" + Environment.NewLine;
-                    Cadena += "A2;MontoImpuesto;;0.00" + Environment.NewLine;
-                    Cadena += "A2;TasaImpuesto;;0" + Environment.NewLine;
-                    Cadena += "A2;MontoImpuestoBase;;" + oBeFEDOC.valorOperacionesExoneradas + Environment.NewLine;
-                }
-                if (Convert.ToDouble(oBeFEDOC.valorOperacionesGratuitas) > 0)
-                {
-                    Cadena += "A2;CodigoImpuesto;;9996" + Environment.NewLine;
-                    Cadena += "A2;MontoImpuesto;;" + oBeFEDOC.Detalles.Sum(x => Convert.ToDouble(x.IgvMontoGratuito)) + Environment.NewLine;
-                    Cadena += "A2;TasaImpuesto;;" + oBeFEDOC.tasaIgv + Environment.NewLine;
-                    Cadena += "A2;MontoImpuestoBase;;" + oBeFEDOC.valorOperacionesGratuitas + Environment.NewLine;
-                }
-
-                //Detalle Detracciones y otros
-                if (oBeFEDOC.tipoComprobante == "01" || oBeFEDOC.tipoComprobante == "03" || oBeFEDOC.tipoComprobante == "08")
-                {
-                    if (oBeFEDOC.TieneDetraccion == "Y")
+                    oBeFE.DocumentoQueSeModificaTipo = oBeFEDOC.ListReferencia[0].tipoDocumento == "01" ? "1" : "2";
+                    oBeFE.DocumentoQueSeModificaSerie = oBeFEDOC.ListReferencia[0].serie;
+                    oBeFE.DocumentoQueSeModificaNumero = oBeFEDOC.ListReferencia[0].correlativo;
+                    if (oBeFEDOC.tipoComprobante == "07")
                     {
-                        Cadena += "A3;codiDetraccion;1;2003" + Environment.NewLine;
-                        Cadena += "A3;ValorDetraccion;1;0" + Environment.NewLine;
-                        Cadena += "A3;MntDetraccion;1;" + oBeFEDOC.totalDetraccion + Environment.NewLine;
-                        Cadena += "A3;PorcentajeDetraccion;1;" + oBeFEDOC.porcentajeDetraccion + Environment.NewLine;
-
-                        Cadena += "A3;codiDetraccion;2;3000" + Environment.NewLine;
-                        Cadena += "A3;ValorDetraccion;2;" + oBeFEDOC.codigoDetraccion + Environment.NewLine;
-                        Cadena += "A3;MntDetraccion;2;0" + Environment.NewLine;
-                        Cadena += "A3;PorcentajeDetraccion;2;0" + Environment.NewLine;
-
-                        Cadena += "A3;codiDetraccion;3;3001" + Environment.NewLine;
-                        Cadena += "A3;ValorDetraccion;3;" + (Globals.IdEmpresa == "1" ? "0000-5017939" : "0000-760994") + Environment.NewLine;
-                        Cadena += "A3;MntDetraccion;3;0" + Environment.NewLine;
-                        Cadena += "A3;PorcentajeDetraccion;3;0" + Environment.NewLine;
+                        oBeFE.TipoDeNotaDeCredito = oBeFEDOC.notaTipo;
+                        oBeFE.TipoDeNotaDeDebito = "";
                     }
-
-                    string TotalCuota = oBeFEDOC.TieneDetraccion == "Y" ? Globals.SumarCadenas(oBeFEDOC.importeTotal, "-" + (oBeFEDOC.tipoMoneda == "SOL" || oBeFEDOC.tipoMoneda == "PEN" ? oBeFEDOC.totalDetraccion : (Math.Round(Convert.ToDouble(oBeFEDOC.totalDetraccion) / Convert.ToDouble(oBeFEDOC.TipoCambio)), 2).ToString())) : oBeFEDOC.importeTotal;
-
-                    //Información de Forma de pago
-                    Cadena += "A;FormaPago;;" + (oBeFEDOC.credito == "Y" ? "Credito" : "Contado") + Environment.NewLine;
-                    Cadena += "A;MontoNetoPendPago;;" + (oBeFEDOC.credito == "Y" ? TotalCuota : "0.00") + Environment.NewLine;
-
-                    if (oBeFEDOC.credito == "Y")
+                    else
                     {
-                        Cadena += "A5;Cuota;1;1" + Environment.NewLine;
-                        Cadena += "A5;MontoCuota;1;" + TotalCuota + Environment.NewLine;
-                        Cadena += "A5;FechaVencCuota;1;" + oBeFEDOC.fechaVencimiento + Environment.NewLine;
+                        oBeFE.TipoDeNotaDeCredito = "";
+                        oBeFE.TipoDeNotaDeDebito = oBeFEDOC.notaTipo;
                     }
                 }
+                else
+                {
+                    oBeFE.DocumentoQueSeModificaTipo = "";
+                    oBeFE.DocumentoQueSeModificaSerie = "";
+                    oBeFE.DocumentoQueSeModificaNumero = "";
+                    oBeFE.TipoDeNotaDeCredito = "";
+                    oBeFE.TipoDeNotaDeDebito = "";
+                }
 
-
+                oBeFE.EnviarAutomaticamenteALaSunat = "true";
+                oBeFE.EnviarAutomaticamenteAlCliente = "false";
+                oBeFE.CodigoUnico = "";
+                oBeFE.CondicionesDePago = oBeFEDOC.credito == "Y" ? "Credito" : "Contado";
+                oBeFE.MedioDePago = "";
+                oBeFE.PlacaVehiculo = "";
+                oBeFE.OrdenCompraServicio = oBeFEDOC.ordenCompra;
+                oBeFE.TablaPersonalizadaCodigo = "";
+                oBeFE.FormatoDePdf = "A4";
+                oBeFE.Items = new List<Entities.Nubefact.Item>();
 
                 for (int i = 0; i < oBeFEDOC.Detalles.Count; i++)
                 {
-                    Cadena += "B;NroLinDet;" + (i + 1) + ";" + (i + 1) + Environment.NewLine;
-                    Cadena += "B;VlrCodigo;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B;QtyItem;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].cantidadUnidades + Environment.NewLine;
-                    Cadena += "B;UnmdItem;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].unidadMedida + Environment.NewLine;
-                    Cadena += "B;NmbItem;" + (i + 1) + ";" + (oBeFEDOC.Detalles[i].descripcion + " " + oBeFEDOC.Detalles[i].Glosa).Trim() + Environment.NewLine;
-                    Cadena += "B;PrcItem;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].precioUnitario + Environment.NewLine;
-                    Cadena += "B;PrcItemSinIgv;" + (i + 1) + ";" + (oBeFEDOC.Detalles[i].TaxOnly == "N" ? oBeFEDOC.Detalles[i].valorUnitario : "0.00") + Environment.NewLine;
-                    Cadena += "B;MontoItem;" + (i + 1) + ";" + (oBeFEDOC.Detalles[i].TaxOnly == "N" ? oBeFEDOC.Detalles[i].valorItem : "0.00") + Environment.NewLine;
-                    Cadena += "B;DescuentoMonto;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].descuento + Environment.NewLine;
-                    Cadena += "B;IndExe;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].IgvTipo + Environment.NewLine;
-                    Cadena += "B;CodigoTipoIgv;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].CodigoTributo + Environment.NewLine;
-                    Cadena += "B;TasaIgv;" + (i + 1) + ";" + (oBeFEDOC.Detalles[i].TaxOnly == "N" ? oBeFEDOC.Detalles[i].tasaIGV : 0.00) + Environment.NewLine;
-                    Cadena += "B;ImpuestoIgv;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].IgvMonto + Environment.NewLine;
-                    //Cadena += "B;CodigoIsc;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;CodigoTipoIsc;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;MontoIsc;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;TasaIsc;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B;MontoBaseImp;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].valorItem + Environment.NewLine;
-                    //Cadena += "B;MontoBaseIsc;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B;CodigoProductoSunat;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;CodigoProductoGS1;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;GS1TipoGTIN;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;CodigoOtrosTributos;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;MontoOtrosTributos;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;MontoBaseOtrosTributos;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;TasaOtrosTributos;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;CodigoTributoBolsaPlastica;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;MontoTributoBolsaPlastica;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;MontoUnitarioBolsaPlastica;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    //Cadena += "B;CantidadBolsaPlastica;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-
-                    //Cargos y Descuentos
-                    /*Cadena += "B1;NroLinDet;" + (i + 1) + ";" + (i + 1) + Environment.NewLine;
-                    Cadena += "B1;DescCargoDescuento;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B1;IndCargoDescuento;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B1;CodigoCargoDescuento;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B1;FactorCargoDescuento;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B1;MontoCargoDescuento;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B1;MBaseCargoDescuento;" + (i + 1) + ";" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;*/
-
-                    //Propiedades adicionales por Item
-                    /*Cadena += "B2;NroLinDet;;" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B2;CodConTrib;;" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B2;NomConTrib;;" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B2;ValConTrib;;" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;
-                    Cadena += "B2;FechaConTrib;;" + oBeFEDOC.Detalles[i].codigo + Environment.NewLine;*/
-
-                }
-
-                //Descuentos y recargos globales
-                if (oBeFEDOC.valorDescuentoGlobal != "0.00")
-                {
-                    Cadena += "C;NroLinDR;;1" + Environment.NewLine;
-                    Cadena += "C;TpoMov;;D" + Environment.NewLine;
-                    Cadena += "C;ValorDR;;" + oBeFEDOC.valorDescuentoGlobal + Environment.NewLine;
-                    Cadena += "C;IndCargoDescuento;;0" + Environment.NewLine;
-                    Cadena += "C;CodigoCargoDescuento;;02" + Environment.NewLine;
-                    //Cadena += "C;FactorCargoDescuento;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                    Cadena += "C;MontoCargoDescuento;;" + oBeFEDOC.valorDescuentoGlobal + Environment.NewLine;
-                    Cadena += "C;MBaseCargoDescuento;;" + oBeFEDOC.valorDescuentoGlobal + Environment.NewLine;
-                }
-
-                if (oBeFEDOC.otrosCargos != "0.00")
-                {
-                    Cadena += "C;NroLinDR;;1" + Environment.NewLine;
-                    Cadena += "C;TpoMov;;R" + Environment.NewLine;
-                    Cadena += "C;ValorDR;;" + oBeFEDOC.otrosCargos + Environment.NewLine;
-                    Cadena += "C;IndCargoDescuento;;1" + Environment.NewLine;
-                    Cadena += "C;CodigoCargoDescuento;;50" + Environment.NewLine;
-                    //Cadena += "C;FactorCargoDescuento;;" + oBeFEDOC.DocEntry + Environment.NewLine;
-                    Cadena += "C;MontoCargoDescuento;;" + oBeFEDOC.otrosCargos + Environment.NewLine;
-                    Cadena += "C;MBaseCargoDescuento;;" + oBeFEDOC.otrosCargos + Environment.NewLine;
-                }
-
-                //Referencias
-                if (oBeFEDOC.tipoComprobante == "07" || oBeFEDOC.tipoComprobante == "08")
-                {
-                    if (oBeFEDOC.ListReferencia.Count == 0)
-                        throw new Exception("Debe llenar los datos del documento referenciado");
-                    if (string.IsNullOrEmpty(oBeFEDOC.ListReferencia[0].tipoDocumento))
-                        throw new Exception("Debe llenar el tipo del documento referenciado");
-                    if (string.IsNullOrEmpty(oBeFEDOC.ListReferencia[0].serie))
-                        throw new Exception("Debe llenar la serie del documento referenciado");
-                    if (string.IsNullOrEmpty(oBeFEDOC.ListReferencia[0].correlativo))
-                        throw new Exception("Debe llenar el correlativo del documento referenciado");
-
-                    Cadena += "D;NroLinRef;1;1" + Environment.NewLine;
-                    Cadena += "D;TpoDocRef;1;" + oBeFEDOC.ListReferencia[0].tipoDocumento + Environment.NewLine;
-                    Cadena += "D;SerieRef;1;" + oBeFEDOC.ListReferencia[0].serie + Environment.NewLine;
-                    Cadena += "D;FolioRef;1;" + oBeFEDOC.ListReferencia[0].correlativo + Environment.NewLine;
-
-                    if (!string.IsNullOrEmpty(oBeFEDOC.ListReferencia[0].fechaEmision))
-                    {
-                        Cadena += "E;TipoAdicSunat;4;01" + Environment.NewLine;
-                        Cadena += "E;NmrLineasAdicSunat;4;04" + Environment.NewLine;
-                        Cadena += "E;DescripcionAdicsunat;4;" + Convert.ToDateTime(oBeFEDOC.ListReferencia[0].fechaEmision).ToString("dd/MM/yyyy") + Environment.NewLine;
-                    }
-
-                    if (!string.IsNullOrEmpty(oBeFEDOC.fechaVencimiento))
-                    {
-                        Cadena += "E;TipoAdicSunat;5;01" + Environment.NewLine;
-                        Cadena += "E;NmrLineasAdicSunat;5;05" + Environment.NewLine;
-                        Cadena += "E;DescripcionAdicsunat;5;" + Convert.ToDateTime(oBeFEDOC.fechaVencimiento).ToString("dd/MM/yyyy") + Environment.NewLine;
-                    }
-                }
-
-                //Seccion personalizados
-                int index = 1;
-                if (!string.IsNullOrEmpty(oBeFEDOC.Responsable))
-                {
-                    Cadena += "E;TipoAdicSunat;" + index + ";01" + Environment.NewLine;
-                    Cadena += "E;NmrLineasAdicSunat;" + index + ";0" + index + Environment.NewLine;
-                    Cadena += "E;DescripcionAdicsunat;" + index + ";" + oBeFEDOC.Responsable + Environment.NewLine;
-                }
-                index++;
-                if (!string.IsNullOrEmpty(oBeFEDOC.condicionPagoDesc))
-                {
-                    Cadena += "E;TipoAdicSunat;" + index + ";01" + Environment.NewLine;
-                    Cadena += "E;NmrLineasAdicSunat;" + index + ";0" + index + Environment.NewLine;
-                    Cadena += "E;DescripcionAdicsunat;" + index + ";" + oBeFEDOC.condicionPagoDesc + Environment.NewLine;
-                }
-                index++;
-                if (!string.IsNullOrEmpty(oBeFEDOC.Comments))
-                {
-                    Cadena += "E;TipoAdicSunat;" + index + ";01" + Environment.NewLine;
-                    Cadena += "E;NmrLineasAdicSunat;" + index + ";0" + index + Environment.NewLine;
-                    Cadena += "E;DescripcionAdicsunat;" + index + ";" + oBeFEDOC.Comments + Environment.NewLine;
-                }
-
-                //Seccion de correos M
-                if (!string.IsNullOrEmpty(oBeFEDOC.adquiriente.email))
-                {
-                    var correos = oBeFEDOC.adquiriente.email.Split(';').ToList();
-                    for (int i = 0; i < correos.Count; i++)
-                    {
-                        Cadena += "M;NroLinMail;;" + (i + 1) + Environment.NewLine;
-                        Cadena += "M;MailEnvi;;" + correos[i].Trim() + Environment.NewLine;
-                    }
+                    Entities.Nubefact.Item item = new Entities.Nubefact.Item();
+                    item.UnidadDeMedida = oBeFEDOC.Detalles[i].unidadMedida;
+                    item.Codigo = oBeFEDOC.Detalles[i].codigo;
+                    item.Descripcion = oBeFEDOC.Detalles[i].descripcion;
+                    item.Cantidad = oBeFEDOC.Detalles[i].cantidadUnidades;
+                    item.ValorUnitario = oBeFEDOC.Detalles[i].valorUnitario;
+                    item.PrecioUnitario = oBeFEDOC.Detalles[i].precioUnitario;
+                    item.Descuento = oBeFEDOC.Detalles[i].descuento;
+                    item.Subtotal = oBeFEDOC.Detalles[i].valorItem;
+                    item.TipoDeIgv = oBeFEDOC.Detalles[i].IgvTipo;
+                    item.Igv = oBeFEDOC.Detalles[i].IgvMonto;
+                    item.Total = Globals.SumarCadenas(oBeFEDOC.Detalles[i].valorItem, oBeFEDOC.Detalles[i].IgvMonto);
+                    item.AnticipoRegularizacion = "false";
+                    item.AnticipoDocumentoSerie = "";
+                    item.AnticipoDocumentoNumero = "";
+                    //item.CodigoProductoSunat = oBeFEDOC.Detalles[i].codigo;
+                    oBeFE.Items.Add(item);
                 }
 
                 try
                 {
-                    System.IO.File.WriteAllText(Globals.PathArchivos + oBeFEDOC.emisor.ruc + "_" + oBeFEDOC.tipoComprobante + "_" + oBeFEDOC.serie + "_" + oBeFEDOC.correlativo + ".TXT", Cadena, System.Text.Encoding.Default);
-                    Folio = oBeFEDOC.serie + "-" + oBeFEDOC.correlativo;
-                    //SAPDI.ActualizarEstadoFE(objectype, docentry, "Documento enviado a OSE", "01", Globals.oCompany);
+                    string json = JsonConvert.SerializeObject(oBeFE, Formatting.Indented);
+                    Console.WriteLine(json);
+                    byte[] bytes = Encoding.Default.GetBytes(json);
+                    string json_en_utf_8 = Encoding.UTF8.GetString(bytes);
+
+                    string json_de_respuesta = SendJson(Globals.URL_OSE, json_en_utf_8, Globals.TOKEN);
+                    dynamic r = JsonConvert.DeserializeObject<Respuesta>(json_de_respuesta);
+                    string r2 = JsonConvert.SerializeObject(r, Formatting.Indented);
+                    dynamic json_r_in = JsonConvert.DeserializeObject<Respuesta>(r2);
+
+                    dynamic leer_respuesta = JsonConvert.DeserializeObject<Respuesta>(json_de_respuesta);
+                    if (leer_respuesta.errors == null)
+                    {
+                        Console.WriteLine(json_r_in);
+                        Console.WriteLine();
+                        Console.WriteLine();
+                        Console.WriteLine("TIPO: " + leer_respuesta.tipo);
+                        Console.WriteLine("SERIE: " + leer_respuesta.serie);
+                        Console.WriteLine("NUMERO: " + leer_respuesta.numero);
+                        Console.WriteLine("URL: " + leer_respuesta.url);
+                        Console.WriteLine("ACEPTADA_POR_SUNAT: " + leer_respuesta.aceptada_por_sunat);
+                        Console.WriteLine("DESCRIPCION SUNAT: " + leer_respuesta.sunat_description);
+                        Console.WriteLine("NOTA SUNAT: " + leer_respuesta.sunat_note);
+                        Console.WriteLine("CODIGO RESPUESTA SUNAT: " + leer_respuesta.sunat_responsecode);
+                        Console.WriteLine("SUNAT ERROR SOAP: " + leer_respuesta.sunat_soap_error);
+                        Console.WriteLine("PDF EN BASE64: " + leer_respuesta.pdf_zip_base64);
+                        Console.WriteLine("XML EN BASE64: " + leer_respuesta.xml_zip_base64);
+                        Console.WriteLine("CDR EN BASE64: " + leer_respuesta.cdr_zip_base64);
+                        Console.WriteLine("CODIGO QR: " + leer_respuesta.cadena_para_codigo_qr);
+                        Console.WriteLine("CODIGO HASH: " + leer_respuesta.codigo_hash);
+                        Console.WriteLine("CODIGO DE BARRAS: " + leer_respuesta.codigo_de_barras);
+                    }
+                    else
+                    {
+                        if (leer_respuesta.errors != "Este documento ya existe en NubeFacT")
+                            throw new Exception(leer_respuesta.errors);
+                    }
                 }
                 catch (System.Exception ex)
                 {
@@ -702,6 +731,134 @@ namespace ServicioConectorFE.OSE
                 GC.Collect();
             }
             return result;
+        }
+
+        public static string SendJson(string ruta, string json, string token)
+        {
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    /// ESPECIFICAMOS EL TIPO DE DOCUMENTO EN EL ENCABEZADO
+                    client.Headers[HttpRequestHeader.ContentType] = "application/json; charset=utf-8";
+                    /// ASI COMO EL TOKEN UNICO
+                    client.Headers[HttpRequestHeader.Authorization] = "Token token=" + token;
+                    /// OBTENEMOS LA RESPUESTA
+                    string respuesta = client.UploadString(ruta, "POST", json);
+                    /// Y LA 'RETORNAMOS'
+                    return respuesta;
+                }
+            }
+            catch (WebException ex)
+            {
+                /// EN CASO EXISTA ALGUN ERROR, LO TOMAMOS
+                var respuesta = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
+                /// Y LO 'RETORNAMOS'
+                return respuesta;
+            }
+        }
+
+        public static void ConsultarEstadoCPE(string tipoDoc, List<Comprobante> listaComp)
+        {
+            try
+            {
+                switch (tipoDoc)
+                {
+                    case "01":
+                    case "03":
+                    case "07":
+                    case "08":
+                        foreach (Comprobante document in listaComp)
+                        {
+                            string mensajeerror = "";
+                            string nombreArchivo = "";
+                            string pdf_url = "";
+                            string xml_url = "";
+                            string cdr_url = "";
+                            bool respuestaanexo = false;
+
+                            #region CONSULTAR COMPROBANTE ESTELA
+                            Entities.Estela.Documento oBeFEDOC = new Entities.Estela.Documento();
+                            oBeFEDOC.DocEntry = document.DocEntry.ToString();
+                            SAPDI.ObtenerDatosCPEEstela(ref oBeFEDOC, document.Tabla);
+                            Consulta consulta = new Consulta();
+                            consulta.operacion = "consultar_comprobante";
+                            consulta.tipo_de_comprobante = oBeFEDOC.tipoComprobante == "01" ? "1" : oBeFEDOC.tipoComprobante == "03" ? "2" : oBeFEDOC.tipoComprobante == "07" ? "3" : "4";
+                            consulta.serie = "FFF1"; // oBeFEDOC.serie;
+                            consulta.numero = oBeFEDOC.correlativo;
+
+                            try
+                            {
+                                string json = JsonConvert.SerializeObject(consulta, Formatting.Indented);
+                                Console.WriteLine(json);
+                                byte[] bytes = Encoding.Default.GetBytes(json);
+                                string json_en_utf_8 = Encoding.UTF8.GetString(bytes);
+
+                                string json_de_respuesta = SendJson(Globals.URL_OSE, json_en_utf_8, Globals.TOKEN);
+                                dynamic r = JsonConvert.DeserializeObject<Respuesta>(json_de_respuesta);
+                                string r2 = JsonConvert.SerializeObject(r, Formatting.Indented);
+                                dynamic json_r_in = JsonConvert.DeserializeObject<Respuesta>(r2);
+
+                                dynamic respuesta = JsonConvert.DeserializeObject<Respuesta>(json_de_respuesta);
+                                string mensaje = string.Empty;
+
+                                if (respuesta.errors == null)
+                                {
+                                    if (respuesta.aceptada_por_sunat)
+                                    {
+                                        nombreArchivo = oBeFEDOC.emisor.ruc + "_" + oBeFEDOC.tipoComprobante + "_" + oBeFEDOC.serie + "_" + oBeFEDOC.correlativo;
+                                        respuestaanexo = SAPDI.AnexarDocumentosCpe(document.DocEntry, nombreArchivo, respuesta.enlace_del_pdf, respuesta.enlace_del_xml, respuesta.enlace_del_cdr, document.ObjType, Globals.oCompany, ref mensajeerror);
+                                        SAPDI.ActualizarEstadoFE(document.ObjType, document.DocEntry, respuesta.sunat_description, "AC_03", Globals.oCompany);
+                                    }
+
+                                }
+                                else
+                                {
+                                    if (respuesta.errors != "Este documento ya existe en NubeFacT")
+                                    {
+                                        mensaje = "Consulta Estado: " + respuesta.errors;
+                                        SAPDI.ActualizarEstadoFE(document.ObjType, document.DocEntry, mensaje, "01", Globals.oCompany);
+                                    }
+                                }
+
+                            }
+                            catch (System.Exception ex)
+                            {
+                            }
+                            #endregion
+                        }
+                        break;
+                    case "20":
+                        foreach (Comprobante document in listaComp)
+                        {
+                            string mensajeerror = "";
+                            string nombreArchivo = "";
+                            string pdf_url = "";
+                            string xml_url = "";
+                            string cdr_url = "";
+                            bool respuestaanexo = false;
+
+                            #region CONSULTAR COMPROBANTE ESTELA
+                            Entities.Estela.Retencion oDocumentoRetFE1 = new Retencion();
+                            SAPDI.ObtenerDatosCRE(document.DocEntry, ref oDocumentoRetFE1);
+                            DateTime date1 = DateTime.Now;
+
+
+                            try
+                            {
+
+                            }
+                            catch (System.Exception ex)
+                            {
+                            }
+                            #endregion
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }

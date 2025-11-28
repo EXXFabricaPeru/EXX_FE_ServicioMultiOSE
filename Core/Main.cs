@@ -20,6 +20,7 @@ namespace ServicioConectorFE.Core
                     try
                     {
                         SAPDI.Conectar(Globals.ListConfig[i]);
+
                         if (!Setup.ValidaVersion(Globals.AddOnName, Globals.AddOnVersion))
                             Structure.CrearMetaData();
 

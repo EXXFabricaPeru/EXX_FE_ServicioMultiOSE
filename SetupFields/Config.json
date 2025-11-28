@@ -2,11 +2,11 @@
   {
     "IdEmpresa": 2,
     "DbServerType": 9,
-    "Server": "NDB@10.4.41.134:30013",
-    "CompanyDB": "SBO_TPE_DESARROLLO",
+    "Server": "NDB@172.16.10.1:30013",
+    "CompanyDB": "Z_PRUEBAS_D",
     "DbUserName": "SAPINST",
-    "DbPassword": "x64GQ$9541",
-    "LicenseServer": "10.4.41.134:40000",
+    "DbPassword": "6xrHeZNRf3",
+    "LicenseServer": "172.16.10.1:40000",
     "UserName": "manager",
     "Password": "m1r1"
   }

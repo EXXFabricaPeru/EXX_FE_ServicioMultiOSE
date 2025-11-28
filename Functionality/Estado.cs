@@ -24,18 +24,22 @@ namespace ServicioConectorFE.Functionality
                     List<Comprobante> listaComp = new List<Comprobante>();
                     listaComp = SAPDI.ListarComprobantexEmitir(DateTime.Now.AddDays(-7), DateTime.Now, tipoDoc, "01");
 
-                    switch (Globals.ProveedorOSE)
-                    {
-                        case "1":
-                            Bizlinks.ConsultarEstadoCPE(tipoDoc, listaComp);
-                            break;
-                        case "2":
-                            Paperless.ConsultarEstadoCPE(tipoDoc, listaComp);
-                            break;
-                        case "3":
-                            Estela.ConsultarEstadoCPE(tipoDoc, listaComp);
-                            break;
-                    }
+                    if (listaComp.Count > 0)
+                        switch (Globals.ProveedorOSE)
+                        {
+                            case "1":
+                                Bizlinks.ConsultarEstadoCPE(tipoDoc, listaComp);
+                                break;
+                            case "2":
+                                Paperless.ConsultarEstadoCPE(tipoDoc, listaComp);
+                                break;
+                            case "3":
+                                Estela.ConsultarEstadoCPE(tipoDoc, listaComp);
+                                break;
+                            case "4":
+                                Nubefact.ConsultarEstadoCPE(tipoDoc, listaComp);
+                                break;
+                        }
                 }
             }
             catch (Exception ex)

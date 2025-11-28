@@ -21,7 +21,7 @@ namespace ServicioConectorFE.Core
 
         public static string configPath = AppDomain.CurrentDomain.BaseDirectory + "SetupFields\\";
         public static List<CONF> ListConfig = new List<CONF>();
-        public static List<string> oDocuments = new List<string> { "01", "03", "07", "08", "20" };
+        public static List<string> oDocuments = new List<string> { "20", "09", "03", "07", "08", "01" };
         public static System.Data.DataTable dtMonedas;
         public static Entities.SAP.OADM oOADM = new Entities.SAP.OADM();
         public static Entities.SAP.ADM1 oADM1 = new Entities.SAP.ADM1();
@@ -31,6 +31,7 @@ namespace ServicioConectorFE.Core
         public static int SFTP_PORT;
         public static string SFTP_USER;
         public static string SFTP_PASS;
+        public static string TOKEN;
 
         public static string ProveedorOSE;
         public static string PathArchivos;
@@ -496,7 +497,7 @@ namespace ServicioConectorFE.Core
             }
         }
 
-        public static void ValidaCamposCRE(Entities.Estela.DocumentoRetencionFE oBeFEDOC)
+        public static void ValidaCamposCRE(Entities.Estela.Retencion oBeFEDOC)
         {
             try
             {

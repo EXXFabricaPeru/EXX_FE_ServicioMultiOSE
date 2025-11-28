@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace ServicioConectorFE.Entities.Estela
 {
-    public class DocumentoRetencionFE
+    public class Retencion
     {
         [XmlElement("serieNumeroRetencion")]
         public string serieNumeroRetencion { get; set; }
@@ -113,6 +113,11 @@ namespace ServicioConectorFE.Entities.Estela
 
         [XmlElement("RetencionItem")]
         public List<RetencionItem> RetencionItems { get; set; }
+
+        public static implicit operator Retencion(Nubefact.Retencion v)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class RetencionItem

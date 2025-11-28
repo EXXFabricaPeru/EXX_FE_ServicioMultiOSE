@@ -18,9 +18,25 @@ namespace ServicioConectorFE.Core
             agregarValorValido("C", "Cabecera (Observacion Adicional)", ref TipoEtiquetaValues);
             agregarValorValido("D", "Detalle (Columna Adicional)", ref TipoEtiquetaValues);
 
+            List<List<String>> TipoDocumentoValues = new List<List<String>>();
+            agregarValorValido("0", "Cabecera (Observacion Adicional)", ref TipoDocumentoValues);
+            agregarValorValido("1", "OTROS TIPOS DOCUMENTO", ref TipoDocumentoValues);
+            agregarValorValido("4", "DNI", ref TipoDocumentoValues);
+            agregarValorValido("6", "CARNET EXTRANJERIA", ref TipoDocumentoValues);
+            agregarValorValido("7", "PASAPORTE", ref TipoDocumentoValues);
+
+
             crearCampo("OCTG", "EXX_ESCRED", "Es crédito?", SAPbobsCOM.BoFieldTypes.db_Alpha, SAPbobsCOM.BoFldSubTypes.st_None, 2, "N", "", false, TrueFalseValues);
 
             crearCampo("NNM1", "EXX_ANEXO", "Ruta a Anexos", SAPbobsCOM.BoFieldTypes.db_Alpha, SAPbobsCOM.BoFldSubTypes.st_None, 254, "", "", false, null);
+
+            crearTabla("EXX_CONDUCTOR_GRE", "Datos del conductor GRE", SAPbobsCOM.BoUTBTableType.bott_NoObject);
+            crearCampo("EXX_CONDUCTOR_GRE", "EXX_NOMBRES", "Nombres", SAPbobsCOM.BoFieldTypes.db_Alpha, SAPbobsCOM.BoFldSubTypes.st_None, 50, "", "", true, null);
+            crearCampo("EXX_CONDUCTOR_GRE", "EXX_APELLIDOS", "Apellidos", SAPbobsCOM.BoFieldTypes.db_Alpha, SAPbobsCOM.BoFldSubTypes.st_None, 50, "", "", true, null);
+            crearCampo("EXX_CONDUCTOR_GRE", "EXX_TIPODOCUI", "Tipo documento", SAPbobsCOM.BoFieldTypes.db_Alpha, SAPbobsCOM.BoFldSubTypes.st_None, 2, "", "", true, TipoDocumentoValues); 
+            crearCampo("EXX_CONDUCTOR_GRE", "EXX_NUMERODOCI", "N° Documento", SAPbobsCOM.BoFieldTypes.db_Alpha, SAPbobsCOM.BoFldSubTypes.st_None, 15, "", "", true, null);
+            crearCampo("EXX_CONDUCTOR_GRE", "EXX_LICENCIA", "Licencia", SAPbobsCOM.BoFieldTypes.db_Alpha, SAPbobsCOM.BoFldSubTypes.st_None, 20, "", "", true, null);
+            
         }
 
         private static void agregarValorValido(String Value, String Description, ref List<List<String>> ValidValues)
